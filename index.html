@@ -6,7 +6,7 @@
 <title>Text-ism</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Jolly+Lodger&family=Amatic+SC:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Jolly+Lodger&family=Amatic+SC:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -29,6 +29,7 @@
     --f-amatic: 'Amatic SC', cursive;
     --f-cnew: 'Courier New', monospace;
     --f-cprime: 'Courier Prime', monospace;
+    --f-press: 'Press Start 2P', monospace;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -197,6 +198,7 @@
     margin-top: 3px;
   }
   .eff-btn:hover { border-color: var(--border-hover); background: var(--bg3); }
+  .eff-btn.active { background: var(--bg3); border-color: rgba(255,255,255,0.4); }
   .eff-btn.pt { border-left: 2px solid var(--accent-pt); }
   .eff-btn.pt .etag { color: var(--accent-pt); }
   .eff-btn.pt.active { background: var(--accent-pt-dim); border-color: var(--accent-pt); }
@@ -404,6 +406,7 @@ const fonts = [
   { name: 'Amatic SC',          css: "'Amatic SC',cursive",                                   tag: 'google · handwritten' },
   { name: 'Courier New',        css: "'Courier New',monospace",                               tag: 'mono' },
   { name: 'Courier Prime',      css: "'Courier Prime',monospace",                             tag: 'google · mono' },
+  { name: 'Press Start 2P',     css: "'Press Start 2P',monospace",                           tag: 'google · pixel' },
 ];
 
 /* ── ZALGO ── */
@@ -427,15 +430,15 @@ const glitchCase = str => str.split('').map((c, i) => i % 3 === 1 ? c.toUpperCas
 
 /* ── EFFECT DEFINITIONS ── */
 const basicEffects = [
-  { name: 'bold',           id: 'bold',      apply: el => { el.style.fontWeight = '700'; } },
-  { name: 'italic',         id: 'italic',    apply: el => { el.style.fontStyle = 'italic'; } },
+  { name: 'wired spacing',  id: 'wired',     apply: el => { el.style.letterSpacing = '0.32em'; } },
   { name: 'all caps',       id: 'allcaps',   apply: el => { el.style.textTransform = 'uppercase'; } },
   { name: 'strikethrough',  id: 'strike',    apply: el => { el.style.textDecoration = 'line-through'; } },
+  { name: 'bold',           id: 'bold',      apply: el => { el.style.fontWeight = '700'; } },
   { name: 'condensed',      id: 'condensed', apply: el => { el.style.letterSpacing = '-0.07em'; } },
   { name: 'underline',      id: 'underline', apply: el => { el.style.textDecoration = 'underline'; } },
-  { name: 'wired spacing',  id: 'wired',     apply: el => { el.style.letterSpacing = '0.32em'; } },
-  { name: 'slow stretch',   id: 'stretch',   apply: el => { el.style.letterSpacing = '0.6em'; } },
   { name: 'tiny',           id: 'tiny',      apply: el => { el.style.fontSize = '0.85rem'; } },
+  { name: 'italic',         id: 'italic',    apply: el => { el.style.fontStyle = 'italic'; } },
+  { name: 'slow stretch',   id: 'stretch',   apply: el => { el.style.letterSpacing = '0.6em'; } },
   { name: 'looming huge',   id: 'huge',      apply: el => { el.style.fontSize = '3.2rem'; } },
 ];
 
@@ -449,6 +452,7 @@ const ptEffects = [
 const npEffects = [
   { name: 'zalgo corruption', id: 'zalgo',    apply: (el) => { el._zalgo = true; } },
   { name: 'creeping fade',    id: 'fade',     apply: el => { el.style.opacity = '0.3'; } },
+  { name: 'slow stretch',     id: 'stretch',  apply: el => { el.style.letterSpacing = '0.6em'; } },
   { name: 'rotated',          id: 'rotated',  apply: el => { el.style.transform = 'rotate(-6deg)'; } },
 ];
 
@@ -622,9 +626,13 @@ function renderPreview() {
   if (pw._zalgo) {
     let frame = 0;
     const base = displayText;
+    const savedStyle = pw.style.cssText;
+    const zSpan = document.createElement('span');
+    pw.innerHTML = '';
+    pw.appendChild(zSpan);
     (function tickZ() {
       const pulse = 2 + Math.sin(frame * 0.07) * 1.5;
-      pw.textContent = zalgoText(base, Math.max(1, Math.round(pulse)));
+      zSpan.textContent = zalgoText(base, Math.max(1, Math.round(pulse)));
       frame++;
       previewZalgoRAF = requestAnimationFrame(tickZ);
     })();
@@ -644,9 +652,12 @@ function buildLbSpan(entry) {
   if (span._zalgo) {
     let frame = 0;
     const base = displayText;
+    const zSpan = document.createElement('span');
+    span.innerHTML = '';
+    span.appendChild(zSpan);
     (function tickZ() {
       const pulse = 3 + Math.sin(frame * 0.07) * 2;
-      span.textContent = zalgoText(base, Math.max(2, Math.round(pulse)));
+      zSpan.textContent = zalgoText(base, Math.max(2, Math.round(pulse)));
       frame++;
       requestAnimationFrame(tickZ);
     })();
