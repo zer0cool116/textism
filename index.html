@@ -703,29 +703,25 @@ function renderLeaderboard() {
 
 /* ── LOAD LEADERBOARD — REALTIME LISTENER ── */
 function loadLeaderboard() {
-  // warm the WebSocket by writing a heartbeat first, then listen
-  push(ref(db, 'textism-ping'), { t: Date.now() })
-    .catch(() => {})
-    .finally(() => {
-      const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
-      onValue(q, snapshot => {
-        if (snapshot.exists()) {
-          const vals = [];
-          snapshot.forEach(child => vals.push(child.val()));
-          leaderboard = vals.sort((a, b) => b.length - a.length);
-        } else {
-          leaderboard = [];
-        }
-        renderLeaderboard();
-      }, e => {
-        console.warn('RTD listen failed:', e);
-        try {
-          const saved = localStorage.getItem('textism-lb');
-          if (saved) leaderboard = JSON.parse(saved);
-        } catch(_) {}
-        renderLeaderboard();
+  const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
+  onValue(q, snapshot => {
+    const vals = [];
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        const v = child.val();
+        if (v && v.word) vals.push(v);
       });
-    });
+    }
+    leaderboard = vals.sort((a, b) => b.length - a.length);
+    try { localStorage.setItem('textism-lb', JSON.stringify(leaderboard)); } catch(_) {}
+    renderLeaderboard();
+  }, e => {
+    console.warn('RTD listen failed:', e);
+    try {
+      const saved = localStorage.getItem('textism-lb');
+      if (saved) { leaderboard = JSON.parse(saved); renderLeaderboard(); }
+    } catch(_) {}
+  });
 }
 
 /* ── ADD TO LEADERBOARD VIA REALTIME DATABASE SDK ── */
@@ -806,11 +802,6 @@ document.getElementById('word-input').addEventListener('input', renderPreview);
 
 /* ── INIT ── */
 renderPreview();
-// show local cache immediately while Firebase loads
-try {
-  const saved = localStorage.getItem('textism-lb');
-  if (saved) { leaderboard = JSON.parse(saved); renderLeaderboard(); }
-} catch(_) {}
 loadLeaderboard();
 </script>
 </body>
