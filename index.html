@@ -430,15 +430,15 @@ const glitchCase = str => str.split('').map((c, i) => i % 3 === 1 ? c.toUpperCas
 
 /* ── EFFECT DEFINITIONS ── */
 const basicEffects = [
-  { name: 'wired spacing',  id: 'wired',     apply: el => { el.style.letterSpacing = '0.32em'; } },
+  { name: 'bold',           id: 'bold',      apply: el => { el.style.fontWeight = '700'; } },
+  { name: 'italic',         id: 'italic',    apply: el => { el.style.fontStyle = 'italic'; } },
+  { name: 'condensed',      id: 'condensed', apply: el => { el.style.letterSpacing = '-0.07em'; } },
   { name: 'all caps',       id: 'allcaps',   apply: el => { el.style.textTransform = 'uppercase'; } },
   { name: 'strikethrough',  id: 'strike',    apply: el => { el.style.textDecoration = 'line-through'; } },
-  { name: 'bold',           id: 'bold',      apply: el => { el.style.fontWeight = '700'; } },
-  { name: 'condensed',      id: 'condensed', apply: el => { el.style.letterSpacing = '-0.07em'; } },
   { name: 'underline',      id: 'underline', apply: el => { el.style.textDecoration = 'underline'; } },
-  { name: 'tiny',           id: 'tiny',      apply: el => { el.style.fontSize = '0.85rem'; } },
-  { name: 'italic',         id: 'italic',    apply: el => { el.style.fontStyle = 'italic'; } },
+  { name: 'wired spacing',  id: 'wired',     apply: el => { el.style.letterSpacing = '0.32em'; } },
   { name: 'slow stretch',   id: 'stretch',   apply: el => { el.style.letterSpacing = '0.6em'; } },
+  { name: 'tiny',           id: 'tiny',      apply: el => { el.style.fontSize = '0.85rem'; } },
   { name: 'looming huge',   id: 'huge',      apply: el => { el.style.fontSize = '3.2rem'; } },
 ];
 
