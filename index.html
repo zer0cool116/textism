@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Jolly+Lodger&family=Amatic+SC:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&display=swap" rel="stylesheet">
-
+ 
 <style>
   :root {
     --bg: #0e0e0e;
@@ -31,9 +31,9 @@
     --f-cprime: 'Courier Prime', monospace;
     --f-press: 'Press Start 2P', monospace;
   }
-
+ 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   body {
     background: var(--bg);
     color: var(--text);
@@ -41,21 +41,21 @@
     min-height: 100vh;
     padding: 0 0 4rem;
   }
-
+ 
   header {
     padding: 3rem 1.5rem 2rem;
     text-align: center;
     border-bottom: 0.5px solid var(--border);
     margin-bottom: 2rem;
   }
-
+ 
   .site-title {
     display: inline-flex;
     align-items: baseline;
     gap: 0;
     line-height: 1;
   }
-
+ 
   .title-left {
     font-size: clamp(2.8rem, 8vw, 5rem);
     font-weight: 700;
@@ -63,14 +63,14 @@
     transition: font-family 1.4s ease;
     font-family: var(--f-rock);
   }
-
+ 
   .title-dash {
     font-size: clamp(2.8rem, 8vw, 5rem);
     color: var(--text3);
     font-family: var(--f-rock);
     font-weight: 400;
   }
-
+ 
   .title-right {
     font-size: clamp(2.8rem, 8vw, 5rem);
     font-weight: 400;
@@ -78,7 +78,7 @@
     transition: font-family 1.4s ease;
     font-family: var(--f-elec);
   }
-
+ 
   .subtitle {
     font-family: var(--f-cprime);
     font-size: 0.8rem;
@@ -87,19 +87,19 @@
     margin-top: 0.6rem;
     text-transform: lowercase;
   }
-
+ 
   .container {
     max-width: 760px;
     margin: 0 auto;
     padding: 0 1.25rem;
   }
-
+ 
   .input-wrap {
     display: flex;
     gap: 8px;
     margin-bottom: 2rem;
   }
-
+ 
   #word-input {
     flex: 1;
     background: var(--bg2);
@@ -114,7 +114,7 @@
   }
   #word-input:focus { border-color: rgba(255,255,255,0.35); }
   #word-input::placeholder { color: var(--text3); }
-
+ 
   .btn-clear {
     background: transparent;
     border: 0.5px solid var(--border-hover);
@@ -128,7 +128,7 @@
     transition: background 0.15s, color 0.15s;
   }
   .btn-clear:hover { background: var(--bg3); color: var(--text); }
-
+ 
   .sec-label {
     font-family: var(--f-elec);
     font-size: 0.65rem;
@@ -146,14 +146,14 @@
     height: 0.5px;
     background: var(--border);
   }
-
+ 
   .font-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 6px;
     margin-bottom: 2rem;
   }
-
+ 
   .font-btn {
     background: var(--bg2);
     border: 0.5px solid var(--border);
@@ -169,14 +169,14 @@
   .font-btn.active { border-color: rgba(255,255,255,0.4); background: var(--bg3); }
   .font-btn .fname { font-size: 1rem; display: block; }
   .font-btn .ftag { font-size: 0.65rem; color: var(--text3); font-family: var(--f-elec); letter-spacing: 0.06em; display: block; margin-top: 3px; }
-
+ 
   .effect-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
     gap: 6px;
     margin-bottom: 2rem;
   }
-
+ 
   .eff-btn {
     background: var(--bg2);
     border: 0.5px solid var(--border);
@@ -205,7 +205,7 @@
   .eff-btn.np { border-left: 2px solid var(--accent-np); }
   .eff-btn.np .etag { color: var(--accent-np); }
   .eff-btn.np.active { background: var(--accent-np-dim); border-color: var(--accent-np); }
-
+ 
   .preview-wrap {
     min-height: 120px;
     border: 0.5px solid var(--border);
@@ -218,7 +218,7 @@
     margin-bottom: 1rem;
     overflow: hidden;
   }
-
+ 
   #preview-word {
     font-size: 2.2rem;
     display: inline-block;
@@ -228,7 +228,7 @@
     word-break: break-all;
     text-align: center;
   }
-
+ 
   .btn-add {
     width: 100%;
     padding: 11px;
@@ -246,22 +246,22 @@
   }
   .btn-add:hover { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.3); }
   .btn-add:active { opacity: 0.7; }
-
+ 
   .divider {
     border: none;
     border-top: 0.5px solid var(--border);
     margin: 0 0 2rem;
   }
-
+ 
   .lb-list { display: flex; flex-direction: column; gap: 8px; }
-
+ 
   .lb-empty {
     font-family: var(--f-cprime);
     font-size: 0.85rem;
     color: var(--text3);
     font-style: italic;
   }
-
+ 
   .lb-row {
     display: flex;
     align-items: center;
@@ -271,33 +271,35 @@
     border: 0.5px solid var(--border);
     border-radius: 6px;
     min-height: 64px;
+    overflow: hidden;
   }
-
+ 
   .lb-rank {
     font-family: var(--f-elec);
     font-size: 0.7rem;
     color: var(--text3);
     min-width: 24px;
+    flex-shrink: 0;
   }
-
+ 
   .lb-center {
     flex: 1;
     overflow: hidden;
     min-width: 0;
-    /* room for zalgo overflow */
     padding: 8px 0;
   }
-
+ 
   .lb-rendered {
-    display: inline-block;
+    display: block;
     font-size: 1.3rem;
     color: var(--text);
     font-family: var(--f-rock);
-    word-break: break-all;
+    white-space: nowrap;
     max-width: 100%;
     line-height: 1.6;
+    transform-origin: left center;
   }
-
+ 
   .lb-meta {
     font-family: var(--f-elec);
     font-size: 0.6rem;
@@ -308,14 +310,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
+ 
   .lb-chars {
     font-family: var(--f-elec);
     font-size: 0.7rem;
     color: var(--text3);
     white-space: nowrap;
   }
-
+ 
   .toast {
     position: fixed;
     bottom: 2rem;
@@ -338,7 +340,7 @@
 </style>
 </head>
 <body>
-
+ 
 <header>
   <div class="site-title">
     <span class="title-left" id="tl">Text</span>
@@ -347,46 +349,46 @@
   </div>
   <p class="subtitle">a writing effects playground</p>
 </header>
-
+ 
 <div class="container">
   <div class="input-wrap">
     <input type="text" id="word-input" placeholder="type a word…" maxlength="80" autocomplete="off" spellcheck="false" />
     <button class="btn-clear" id="btn-clear">clear all</button>
   </div>
-
+ 
   <div class="sec-label">font</div>
   <div class="font-grid" id="font-grid"></div>
-
+ 
   <div class="sec-label">basic effects</div>
   <div class="effect-grid" id="basic-grid"></div>
-
+ 
   <div class="sec-label">PowerTrip: TecHJuNKiE effects</div>
   <div class="effect-grid" id="pt-grid"></div>
-
+ 
   <div class="sec-label">Neighbourhood Paranoia effects</div>
   <div class="effect-grid" id="np-grid"></div>
-
+ 
   <div class="preview-wrap">
     <span id="preview-word">your word</span>
   </div>
-
+ 
   <button class="btn-add" id="btn-add">+ add to leaderboard</button>
-
+ 
   <hr class="divider">
-
+ 
   <div class="sec-label">leaderboard — longest words</div>
   <div class="lb-list" id="lb-list">
     <div class="lb-empty">loading…</div>
   </div>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script type="module">
 import { initializeApp }                              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getDatabase, ref, push, query,
          orderByChild, limitToLast, onValue }         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-
+ 
 /* ── REALTIME DATABASE SDK ── */
 const app = initializeApp({
   apiKey:      'AIzaSyCP3EQbwFp_htub5fureD2xSq1XEJeiqXg',
@@ -396,7 +398,7 @@ const app = initializeApp({
   appId:       '1:571530609364:web:1265acc2ebff4d03e6f141',
 });
 const db = getDatabase(app);
-
+ 
 /* ── FONTS ── */
 const fonts = [
   { name: 'Rockwell',           css: "'Rockwell','Rockwell Nova',serif",                     tag: 'serif' },
@@ -408,7 +410,7 @@ const fonts = [
   { name: 'Courier Prime',      css: "'Courier Prime',monospace",                             tag: 'google · mono' },
   { name: 'Press Start 2P',     css: "'Press Start 2P',monospace",                           tag: 'google · pixel' },
 ];
-
+ 
 /* ── ZALGO ── */
 const zalgoUp   = ['\u030d','\u030e','\u0304','\u0305','\u033f','\u0311','\u0306','\u0310','\u0352','\u0357','\u0351','\u0307','\u0308','\u030a','\u0342','\u0343','\u0344','\u034a','\u034b','\u034c','\u0303','\u0302','\u030c','\u0350','\u0300','\u0301','\u030b','\u030f','\u0312','\u0313','\u0314','\u033d','\u0309','\u0363','\u0364','\u0365','\u0366','\u0367','\u0368','\u0369','\u036a','\u036b','\u036c','\u036d','\u036e','\u036f','\u033e','\u035b'];
 const zalgoDown = ['\u0316','\u0317','\u0318','\u0319','\u031c','\u031d','\u031e','\u031f','\u0320','\u0324','\u0325','\u0326','\u0329','\u032a','\u032b','\u032c','\u032d','\u032e','\u032f','\u0330','\u0331','\u0332','\u0333','\u0339','\u033a','\u033b','\u033c','\u0345','\u0347','\u0348','\u0349','\u034d','\u034e','\u0353','\u0354','\u0355','\u0356','\u0359','\u035a','\u0323'];
@@ -424,10 +426,10 @@ function zalgoChar(char, intensity) {
 function zalgoText(text, intensity) {
   return text.split('').map(c => (c === ' ' || c === '"') ? c : zalgoChar(c, intensity)).join('');
 }
-
+ 
 /* ── GLITCH CASE ── */
 const glitchCase = str => str.split('').map((c, i) => i % 3 === 1 ? c.toUpperCase() : c.toLowerCase()).join('');
-
+ 
 /* ── EFFECT DEFINITIONS ── */
 const basicEffects = [
   { name: 'bold',           id: 'bold',      apply: el => { el.style.fontWeight = '700'; } },
@@ -462,7 +464,7 @@ let activePT    = new Set();
 let activeNP    = new Set();
 let leaderboard = [];
 let previewZalgoRAF = null;
-
+ 
 /* ── BUILD FONT GRID ── */
 const fontGrid = document.getElementById('font-grid');
 fonts.forEach((f, i) => {
@@ -476,7 +478,7 @@ fonts.forEach((f, i) => {
   });
   fontGrid.appendChild(btn);
 });
-
+ 
 /* ── BUILD EFFECT GRIDS ── */
 function buildEffGrid(effects, containerId, cls, stateSet) {
   const grid = document.getElementById(containerId);
@@ -495,7 +497,7 @@ function buildEffGrid(effects, containerId, cls, stateSet) {
 buildEffGrid(basicEffects, 'basic-grid', '',   activeBasic);
 buildEffGrid(ptEffects,    'pt-grid',    'pt', activePT);
 buildEffGrid(npEffects,    'np-grid',    'np', activeNP);
-
+ 
 /* ── RESET ELEMENT ── */
 function resetEl(el, size) {
   const fam = activeFont !== null ? fonts[activeFont].css : "'Rockwell','Rockwell Nova',serif";
@@ -504,71 +506,71 @@ function resetEl(el, size) {
   el._heir  = false;
   el._echo  = false;
 }
-
+ 
 /* ── APPLY EFFECTS TO AN ELEMENT ── */
 function applyEffects(el, word, fontCss, basicIdxs, ptIdxs, npIdxs, baseSize) {
   const fam = fontCss || "'Rockwell','Rockwell Nova',serif";
   el.style.cssText = `font-size:${baseSize||'1.3rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;`;
   el._zalgo = false; el._heir = false; el._echo = false;
   el.textContent = word;
-
+ 
   let displayText = word;
-
+ 
   basicIdxs.forEach(i => { if (basicEffects[i]) basicEffects[i].apply(el, displayText); });
-
+ 
   ptIdxs.forEach(i => {
     const eff = ptEffects[i];
     if (!eff) return;
     if (eff.id === 'glitch-case') { displayText = glitchCase(displayText); el.textContent = displayText; }
     else eff.apply(el, displayText);
   });
-
+ 
   npIdxs.forEach(i => { if (npEffects[i]) npEffects[i].apply(el, displayText); });
-
+ 
   return displayText;
 }
-
+ 
 /* ── HEIR OF SPACE ── */
 function buildHeirEffect(el, text) {
   el.innerHTML = '';
   el.style.position = 'relative';
-
+ 
   const main = document.createElement('span');
   main.textContent = text;
   main.style.cssText = 'color:#e8f0e0;position:relative;z-index:1;';
-
+ 
   const rg = document.createElement('span');
   rg.textContent = text;
   rg.style.cssText = 'position:absolute;top:0;left:0;color:#7ecfb3;opacity:0;pointer-events:none;z-index:0;white-space:nowrap;transition:transform 0.08s ease,opacity 0.15s;';
-
+ 
   const bg = document.createElement('span');
   bg.textContent = text;
   bg.style.cssText = 'position:absolute;top:0;left:0;color:#a8a89e;opacity:0;pointer-events:none;z-index:0;white-space:nowrap;transition:transform 0.08s ease,opacity 0.15s;';
-
+ 
   el.appendChild(rg);
   el.appendChild(bg);
   el.appendChild(main);
   el._rg = rg;
   el._bg = bg;
 }
-
+ 
 /* ── ECHO RIPPLE ── */
 function buildEchoEffect(el, text) {
   el.innerHTML = '';
   el.style.color = 'var(--accent-np)';
   el.style.cursor = 'default';
-
+ 
   [...text].forEach(ch => {
     const span = document.createElement('span');
     span.style.cssText = 'position:relative;display:inline-block;';
     span.textContent = ch === ' ' ? '\u00a0' : ch;
-
+ 
     for (let i = 0; i < 3; i++) {
       const ring = document.createElement('span');
       ring.style.cssText = 'position:absolute;inset:0;border-radius:1px;pointer-events:none;opacity:0;border:1px solid var(--accent-np);transform:scale(1);transition:none;';
       span.appendChild(ring);
     }
-
+ 
     span.addEventListener('mouseenter', () => {
       span.querySelectorAll('span').forEach((ring, i) => {
         ring.style.transition = 'none';
@@ -582,11 +584,11 @@ function buildEchoEffect(el, text) {
         setTimeout(() => { ring.style.opacity = '0'; }, 300 + i * 120);
       });
     });
-
+ 
     el.appendChild(span);
   });
 }
-
+ 
 /* ── HEIR PARALLAX LOOP (preview only) ── */
 let heirMx = window.innerWidth / 2, heirMy = window.innerHeight / 2;
 let heirCx = heirMx, heirCy = heirMy;
@@ -594,8 +596,10 @@ document.addEventListener('mousemove', e => { heirMx = e.clientX; heirMy = e.cli
 (function animHeir() {
   heirCx += (heirMx - heirCx) * 0.08;
   heirCy += (heirMy - heirCy) * 0.08;
-  const el = document.getElementById('preview-word');
-  if (el?._rg && el?._bg) {
+ 
+  const targets = [document.getElementById('preview-word'), ...document.querySelectorAll('.lb-rendered')];
+  targets.forEach(el => {
+    if (!el?._rg || !el?._bg) return;
     const rect = el.getBoundingClientRect();
     const dx = (heirCx - (rect.left + rect.width / 2)) / window.innerWidth;
     const dy = (heirCy - (rect.top  + rect.height / 2)) / window.innerHeight;
@@ -606,22 +610,23 @@ document.addEventListener('mousemove', e => { heirMx = e.clientX; heirMy = e.cli
     el._bg.style.transform = `translate(${-dx * shift * 2}px,${-dy * shift}px)`;
     el._rg.style.opacity = intensity * 0.85;
     el._bg.style.opacity = intensity * 0.85;
-  }
+  });
+ 
   requestAnimationFrame(animHeir);
 })();
-
+ 
 /* ── RENDER PREVIEW ── */
 function renderPreview() {
   if (previewZalgoRAF) { cancelAnimationFrame(previewZalgoRAF); previewZalgoRAF = null; }
-
+ 
   const word = document.getElementById('word-input').value || 'your word';
   const pw   = document.getElementById('preview-word');
-
+ 
   resetEl(pw, '2.2rem');
   const displayText = applyEffects(pw, word,
     activeFont !== null ? fonts[activeFont].css : null,
     [...activeBasic], [...activePT], [...activeNP], '2.2rem');
-
+ 
   if (pw._zalgo) {
     let frame = 0;
     const base = displayText;
@@ -639,15 +644,27 @@ function renderPreview() {
   if (pw._heir) buildHeirEffect(pw, displayText);
   if (pw._echo) buildEchoEffect(pw, displayText);
 }
-
+ 
+/* ── SCALE TO FIT ── */
+function scaleToFit(el, container) {
+  el.style.transform = 'scaleX(1)';
+  requestAnimationFrame(() => {
+    const available = container.clientWidth;
+    const natural   = el.scrollWidth;
+    if (natural > available && available > 0) {
+      el.style.transform = `scaleX(${available / natural})`;
+    }
+  });
+}
+ 
 /* ── RENDER LEADERBOARD ENTRY SPAN ── */
-function buildLbSpan(entry) {
+function buildLbSpan(entry, container) {
   const span = document.createElement('span');
   span.className = 'lb-rendered';
-
+ 
   const displayText = applyEffects(span, entry.word,
     entry.fontCss, entry.basicIdxs || [], entry.ptIdxs || [], entry.npIdxs || [], '1.3rem');
-
+ 
   if (span._zalgo) {
     let frame = 0;
     const base = displayText;
@@ -663,34 +680,35 @@ function buildLbSpan(entry) {
   }
   if (span._heir) buildHeirEffect(span, displayText);
   if (span._echo) buildEchoEffect(span, displayText);
-
-  // static noise: exaggerate for leaderboard
+ 
   if ((entry.ptIdxs||[]).some(i => ptEffects[i]?.id === 'static')) {
     span.style.textShadow = '3px 0 0 rgba(126,207,179,1), -3px 0 0 rgba(212,96,122,1), 0 0 12px rgba(126,207,179,0.7), 0 0 20px rgba(212,96,122,0.5)';
   }
-
+ 
+  if (container) requestAnimationFrame(() => scaleToFit(span, container));
+ 
   return span;
 }
-
+ 
 /* ── RENDER LEADERBOARD UI ── */
 function renderLeaderboard() {
   const ll = document.getElementById('lb-list');
   if (!leaderboard.length) { ll.innerHTML = '<div class="lb-empty">no entries yet.</div>'; return; }
   ll.innerHTML = '';
-
+ 
   leaderboard.forEach((entry, i) => {
     const row = document.createElement('div');
     row.className = 'lb-row';
-
+ 
     const rank = document.createElement('div');
     rank.className = 'lb-rank';
     rank.textContent = '#' + (i + 1);
-
+ 
     const center = document.createElement('div');
     center.className = 'lb-center';
-
-    center.appendChild(buildLbSpan(entry));
-
+ 
+    center.appendChild(buildLbSpan(entry, center));
+ 
     const meta = document.createElement('div');
     meta.className = 'lb-meta';
     const parts = [];
@@ -698,18 +716,18 @@ function renderLeaderboard() {
     if (entry.effNames?.length) parts.push(entry.effNames.join(' · '));
     meta.textContent = parts.join(' / ') || 'no effects';
     center.appendChild(meta);
-
+ 
     const chars = document.createElement('div');
     chars.className = 'lb-chars';
     chars.textContent = entry.word.length + ' chars';
-
+ 
     row.appendChild(rank);
     row.appendChild(center);
     row.appendChild(chars);
     ll.appendChild(row);
   });
 }
-
+ 
 /* ── LOAD LEADERBOARD — REALTIME LISTENER ── */
 function loadLeaderboard() {
   const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
@@ -732,19 +750,19 @@ function loadLeaderboard() {
     } catch(_) {}
   });
 }
-
+ 
 /* ── ADD TO LEADERBOARD VIA REALTIME DATABASE SDK ── */
 async function addToLeaderboard() {
   const word = document.getElementById('word-input').value.trim();
   if (!word) { showToast('type a word first'); return; }
-
+ 
   const fontName    = activeFont !== null ? fonts[activeFont].name : null;
   const fontCss     = activeFont !== null ? fonts[activeFont].css  : "'Rockwell','Rockwell Nova',serif";
   const ptNames     = [...activePT].map(i  => ptEffects[i].name);
   const npNames     = [...activeNP].map(i  => npEffects[i].name);
   const basicNames  = [...activeBasic].map(i => basicEffects[i].name);
   const allEffNames = [...basicNames, ...ptNames, ...npNames];
-
+ 
   const entry = {
     word,
     length:    word.length,
@@ -756,7 +774,7 @@ async function addToLeaderboard() {
     effNames:  allEffNames,
     addedAt:   Date.now(),
   };
-
+ 
   try {
     await push(ref(db, 'textism'), entry);
     showToast('added to leaderboard');
@@ -770,14 +788,14 @@ async function addToLeaderboard() {
     renderLeaderboard();
   }
 }
-
+ 
 /* ── CLEAR ALL ── */
 function clearAll() {
   activeFont = null; activeBasic.clear(); activePT.clear(); activeNP.clear();
   document.querySelectorAll('.font-btn, .eff-btn').forEach(b => b.classList.remove('active'));
   renderPreview();
 }
-
+ 
 /* ── TOAST ── */
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -785,7 +803,7 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1800);
 }
-
+ 
 /* ── TITLE FONT CYCLE ── */
 const titlePairs = [
   ["'Rockwell','Rockwell Nova',serif",                     "'Electrolize',sans-serif"],
@@ -802,15 +820,16 @@ setInterval(() => {
   document.getElementById('tl').style.fontFamily = titlePairs[titleIdx][0];
   document.getElementById('tr').style.fontFamily = titlePairs[titleIdx][1];
 }, 4500);
-
+ 
 /* ── WIRE UP BUTTONS (module scope safe) ── */
 document.getElementById('btn-clear').addEventListener('click', clearAll);
 document.getElementById('btn-add').addEventListener('click', addToLeaderboard);
 document.getElementById('word-input').addEventListener('input', renderPreview);
-
+ 
 /* ── INIT ── */
 renderPreview();
 loadLeaderboard();
 </script>
 </body>
 </html>
+ 
