@@ -647,12 +647,15 @@ function renderPreview() {
  
 /* ── SCALE TO FIT ── */
 function scaleToFit(el, container) {
-  el.style.transform = 'scaleX(1)';
+  const hasRotate = el.style.transform && el.style.transform.includes('rotate');
+  const rotate = hasRotate ? el.style.transform : '';
+  el.style.transform = rotate || 'scaleX(1)';
   requestAnimationFrame(() => {
     const available = container.clientWidth;
     const natural   = el.scrollWidth;
     if (natural > available && available > 0) {
-      el.style.transform = `scaleX(${available / natural})`;
+      const scale = `scaleX(${available / natural})`;
+      el.style.transform = rotate ? `${rotate} ${scale}` : scale;
     }
   });
 }
