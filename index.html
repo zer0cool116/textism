@@ -654,6 +654,15 @@ function renderPreview() {
  
 /* ── SCALE TO FIT ── */
 function scaleToFit(el, container) {
+  const isRotated = el.style.transform && el.style.transform.includes('rotate');
+  if (isRotated) {
+    el.style.whiteSpace = 'nowrap';
+    el.style.transform = 'rotate(-6deg)';
+    el.style.display = 'inline-block';
+    const row = el.closest('.lb-row');
+    if (row) { row.style.paddingTop = '28px'; row.style.paddingBottom = '28px'; }
+    return;
+  }
   el.style.transform = 'scaleX(1)';
   requestAnimationFrame(() => {
     const available = container.clientWidth;
@@ -842,3 +851,4 @@ loadLeaderboard();
 </script>
 </body>
 </html>
+ 
