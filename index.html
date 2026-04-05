@@ -271,7 +271,7 @@
     border: 0.5px solid var(--border);
     border-radius: 6px;
     min-height: 64px;
-    overflow: hidden;
+    overflow: visible;
   }
  
   .lb-rank {
@@ -429,6 +429,8 @@ function zalgoText(text, intensity) {
  
 /* ── GLITCH CASE ── */
 const glitchCase = str => str.split('').map((c, i) => i % 3 === 1 ? c.toUpperCase() : c.toLowerCase()).join('');
+
+
  
 /* ── EFFECT DEFINITIONS ── */
 const basicEffects = [
@@ -444,6 +446,8 @@ const basicEffects = [
   { name: 'looming huge',   id: 'huge',      apply: el => { el.style.fontSize = '3.2rem'; } },
 ];
 
+
+ 
 const ptEffects = [
   { name: 'TecHJuNKiE case', id: 'glitch-case', apply: (el, text) => { el.textContent = glitchCase(text); } },
   { name: 'static noise',    id: 'static',      apply: el => { el.style.textShadow = '2px 0 0 rgba(126,207,179,0.9), -2px 0 0 rgba(212,96,122,0.9), 0 0 8px rgba(126,207,179,0.5)'; } },
@@ -632,6 +636,9 @@ function renderPreview() {
     const base = displayText;
     const savedStyle = pw.style.cssText;
     const zSpan = document.createElement('span');
+    zSpan.style.fontFamily = 'inherit';
+    zSpan.style.fontSize = 'inherit';
+    zSpan.style.color = 'inherit';
     pw.innerHTML = '';
     pw.appendChild(zSpan);
     (function tickZ() {
@@ -647,15 +654,12 @@ function renderPreview() {
  
 /* ── SCALE TO FIT ── */
 function scaleToFit(el, container) {
-  const hasRotate = el.style.transform && el.style.transform.includes('rotate');
-  const rotate = hasRotate ? el.style.transform : '';
-  el.style.transform = rotate || 'scaleX(1)';
+  el.style.transform = 'scaleX(1)';
   requestAnimationFrame(() => {
     const available = container.clientWidth;
     const natural   = el.scrollWidth;
     if (natural > available && available > 0) {
-      const scale = `scaleX(${available / natural})`;
-      el.style.transform = rotate ? `${rotate} ${scale}` : scale;
+      el.style.transform = `scaleX(${available / natural})`;
     }
   });
 }
@@ -672,6 +676,9 @@ function buildLbSpan(entry, container) {
     let frame = 0;
     const base = displayText;
     const zSpan = document.createElement('span');
+    zSpan.style.fontFamily = 'inherit';
+    zSpan.style.fontSize = 'inherit';
+    zSpan.style.color = 'inherit';
     span.innerHTML = '';
     span.appendChild(zSpan);
     (function tickZ() {
@@ -835,4 +842,3 @@ loadLeaderboard();
 </script>
 </body>
 </html>
- 
