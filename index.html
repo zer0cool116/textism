@@ -753,14 +753,13 @@ async function addToLeaderboard() {
     showToast('added to leaderboard');
   } catch(e) {
     console.warn('RTD write failed:', e);
-    showToast('saved locally');
+    // fallback: add locally if Firebase failed
+    leaderboard.push(entry);
+    leaderboard.sort((a, b) => b.length - a.length);
+    leaderboard = leaderboard.slice(0, 10);
+    try { localStorage.setItem('textism-lb', JSON.stringify(leaderboard)); } catch(_) {}
+    renderLeaderboard();
   }
-
-  leaderboard.push(entry);
-  leaderboard.sort((a, b) => b.length - a.length);
-  leaderboard = leaderboard.slice(0, 10);
-  try { localStorage.setItem('textism-lb', JSON.stringify(leaderboard)); } catch(_) {}
-  renderLeaderboard();
 }
 
 /* ── CLEAR ALL ── */
