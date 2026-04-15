@@ -564,10 +564,6 @@ buildEffGrid(basicEffects, 'basic-grid', '',   activeBasic);
 buildEffGrid(ptEffects,    'pt-grid',    'pt', activePT);
 buildEffGrid(npEffects,    'np-grid',    'np', activeNP);
 
-infiniFonts.forEach((f, i) => {
-  const btn = document.createElement('button');
-  btn.className = 'font-btn';
-
   btn.innerHTML = `
     <span class="fname" style="font-family:${f.css}">${f.name}</span>
     <span class="ftag">${f.tag}</span>
