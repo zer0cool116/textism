@@ -6,8 +6,7 @@
 <title>Text-ism</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Jolly+Lodger&family=Amatic+SC:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&display=swap" rel="stylesheet">
- 
+<link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Jolly+Lodger&family=Amatic+SC:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&family=Pixelify+Sans:wght@400;700&family=Tiny5&family=Doto&family=Jacquard+12&family=DynaPuff:wght@400;600&family=Chewy&family=Cherry+Bomb+One&display=swap" rel="stylesheet"> 
 <style>
   :root {
     --bg: #0e0e0e;
@@ -345,7 +344,7 @@
   justify-content: flex-end;
   align-items: center;
   gap: 8px;
-  font-family: var(--f-tiny, monospace);
+  font-family: var(--f-cprime);
   font-size: 0.65rem;
   color: var(--text3);
 }
@@ -395,7 +394,6 @@
   <div class="effect-grid" id="np-grid"></div>
 
 <div class="sec-label">Infini-Spired Pack</div>
-
 <div class="font-grid" id="infini-font-grid"></div>
 
 <div class="infini-pack">
@@ -529,7 +527,24 @@ fonts.forEach((f, i) => {
   });
   fontGrid.appendChild(btn);
 });
- 
+
+ const infiniGrid = document.getElementById('infini-font-grid');
+
+infiniFonts.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'font-btn';
+
+  btn.innerHTML = `<span class="fname" style="font-family:${f.css}">${f.name}</span><span class="ftag">${f.tag}</span>`;
+
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+    activeFont = { css: f.css, name: f.name };
+    btn.classList.add('active');
+    renderPreview();
+  });
+
+  infiniGrid.appendChild(btn);
+});
 /* ── BUILD EFFECT GRIDS ── */
 function buildEffGrid(effects, containerId, cls, stateSet) {
   const grid = document.getElementById(containerId);
@@ -575,7 +590,13 @@ infiniFonts.forEach((f, i) => {
  
 /* ── RESET ELEMENT ── */
 function resetEl(el, size) {
-  const fam = activeFont !== null ? fonts[activeFont].css : "'Rockwell','Rockwell Nova',serif";
+  let fam = "'Rockwell','Rockwell Nova',serif";
+
+if (activeFont !== null) {
+  fam = typeof activeFont === 'object'
+    ? activeFont.css
+    : fonts[activeFont].css;
+}
   el.style.cssText = `font-size:${size||'2.2rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;text-align:center;`;
   el._zalgo = false;
   el._heir  = false;
@@ -586,10 +607,9 @@ function resetEl(el, size) {
 function applyEffects(el, word, fontCss, basicIdxs, ptIdxs, npIdxs, baseSize) {
   let fam = "'Rockwell','Rockwell Nova',serif";
 
-if (activeFont !== null) {
-  fam = typeof activeFont === 'object'
-    ? activeFont.css
-    : fonts[activeFont].css;
+activeFont !== null
+  ? (typeof activeFont === 'object' ? activeFont.css : fonts[activeFont].css)
+  : null
 }
   el.style.cssText = `font-size:${baseSize||'1.3rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;`;
   el._zalgo = false; el._heir = false; el._echo = false;
