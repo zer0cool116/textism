@@ -337,6 +337,32 @@
     z-index: 100;
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+ .infini-pack {
+  margin-top: -1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--f-tiny, monospace);
+  font-size: 0.65rem;
+  color: var(--text3);
+}
+
+.infini-pack img {
+  height: 31px;
+  image-rendering: pixelated;
+  opacity: 0.85;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.infini-pack img:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+ 
 </style>
 </head>
 <body>
@@ -367,6 +393,17 @@
  
   <div class="sec-label">Neighbourhood Paranoia effects</div>
   <div class="effect-grid" id="np-grid"></div>
+
+<div class="sec-label">Infini-Spired Pack</div>
+
+<div class="font-grid" id="infini-font-grid"></div>
+
+<div class="infini-pack">
+  <span>inspired by</span>
+  <a href="https://infini.gay" target="_blank">
+    <img src="https://infini.gay/images/infinibutton.gif" alt="infini site button">
+  </a>
+</div>
  
   <div class="preview-wrap">
     <span id="preview-word">your word</span>
@@ -409,6 +446,16 @@ const fonts = [
   { name: 'Courier New',        css: "'Courier New',monospace",                               tag: 'mono' },
   { name: 'Courier Prime',      css: "'Courier Prime',monospace",                             tag: 'google · mono' },
   { name: 'Press Start 2P',     css: "'Press Start 2P',monospace",                           tag: 'google · pixel' },
+];
+
+ const infiniFonts = [
+  { name: 'Pixelify Sans', css: "'Pixelify Sans', sans-serif", tag: 'pixel · clean' },
+  { name: 'Tiny5', css: "'Tiny5', monospace", tag: 'pixel · crunchy' },
+  { name: 'Doto', css: "'Doto', sans-serif", tag: 'soft · UI' },
+  { name: 'Jacquard 12', css: "'Jacquard 12', cursive", tag: 'ornate · weird' },
+  { name: 'DynaPuff', css: "'DynaPuff', cursive", tag: 'bouncy · fun' },
+  { name: 'Chewy', css: "'Chewy', cursive", tag: 'cartoon · soft' },
+  { name: 'Cherry Bomb One', css: "'Cherry Bomb One', cursive", tag: 'bold · playful' },
 ];
  
 /* ── ZALGO ── */
@@ -501,6 +548,30 @@ function buildEffGrid(effects, containerId, cls, stateSet) {
 buildEffGrid(basicEffects, 'basic-grid', '',   activeBasic);
 buildEffGrid(ptEffects,    'pt-grid',    'pt', activePT);
 buildEffGrid(npEffects,    'np-grid',    'np', activeNP);
+
+ const infiniGrid = document.getElementById('infini-font-grid');
+
+infiniFonts.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'font-btn';
+
+  btn.innerHTML = `
+    <span class="fname" style="font-family:${f.css}">${f.name}</span>
+    <span class="ftag">${f.tag}</span>
+  `;
+
+  btn.addEventListener('click', () => {
+    // clear ALL font buttons (both grids)
+    document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+
+    activeFont = { css: f.css, name: f.name }; // important change
+    btn.classList.add('active');
+
+    renderPreview();
+  });
+
+  infiniGrid.appendChild(btn);
+});
  
 /* ── RESET ELEMENT ── */
 function resetEl(el, size) {
@@ -513,7 +584,13 @@ function resetEl(el, size) {
  
 /* ── APPLY EFFECTS TO AN ELEMENT ── */
 function applyEffects(el, word, fontCss, basicIdxs, ptIdxs, npIdxs, baseSize) {
-  const fam = fontCss || "'Rockwell','Rockwell Nova',serif";
+  let fam = "'Rockwell','Rockwell Nova',serif";
+
+if (activeFont !== null) {
+  fam = typeof activeFont === 'object'
+    ? activeFont.css
+    : fonts[activeFont].css;
+}
   el.style.cssText = `font-size:${baseSize||'1.3rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;`;
   el._zalgo = false; el._heir = false; el._echo = false;
   el.textContent = word;
@@ -628,7 +705,9 @@ function renderPreview() {
  
   resetEl(pw, '2.2rem');
   const displayText = applyEffects(pw, word,
-    activeFont !== null ? fonts[activeFont].css : null,
+    activeFont !== null
+  ? (typeof activeFont === 'object' ? activeFont.css : fonts[activeFont].css)
+  : null
     [...activeBasic], [...activePT], [...activeNP], '2.2rem');
  
   if (pw._zalgo) {
@@ -774,9 +853,18 @@ function loadLeaderboard() {
 async function addToLeaderboard() {
   const word = document.getElementById('word-input').value.trim();
   if (!word) { showToast('type a word first'); return; }
- 
-  const fontName    = activeFont !== null ? fonts[activeFont].name : null;
-  const fontCss     = activeFont !== null ? fonts[activeFont].css  : "'Rockwell','Rockwell Nova',serif";
+ let fontName = null;
+let fontCss = "'Rockwell','Rockwell Nova',serif";
+
+if (activeFont !== null) {
+  if (typeof activeFont === 'object') {
+    fontName = activeFont.name;
+    fontCss = activeFont.css;
+  } else {
+    fontName = fonts[activeFont].name;
+    fontCss = fonts[activeFont].css;
+  }
+}
   const ptNames     = [...activePT].map(i  => ptEffects[i].name);
   const npNames     = [...activeNP].map(i  => npEffects[i].name);
   const basicNames  = [...activeBasic].map(i => basicEffects[i].name);
