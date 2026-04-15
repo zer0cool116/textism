@@ -727,7 +727,7 @@ function renderPreview() {
   const displayText = applyEffects(pw, word,
     activeFont !== null
   ? (typeof activeFont === 'object' ? activeFont.css : fonts[activeFont].css)
-  : null
+  : null,
     [...activeBasic], [...activePT], [...activeNP], '2.2rem');
  
   if (pw._zalgo) {
