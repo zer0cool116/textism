@@ -935,8 +935,27 @@ document.getElementById('word-input').addEventListener('input', renderPreview);
 renderPreview();
 
 document.fonts.ready.then(() => {
-  loadLeaderboard();
-});
+  function loadLeaderboard() {
+  const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
+
+  onValue(q, snapshot => {
+    const vals = [];
+
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        const v = child.val();
+        if (v && v.word) vals.push(v);
+      });
+    }
+
+    leaderboard = vals.sort((a, b) => b.length - a.length);
+
+    renderLeaderboard();
+
+  }, e => {
+    console.warn('RTD listen failed:', e);
+  });
+}
 </script>
 </body>
 </html>
