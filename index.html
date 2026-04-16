@@ -827,22 +827,33 @@ function renderLeaderboard() {
 /* ── LOAD LEADERBOARD — REALTIME LISTENER ── */
 function loadLeaderboard() {
   const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
+
   onValue(q, snapshot => {
     const vals = [];
+
     if (snapshot.exists()) {
       snapshot.forEach(child => {
         const v = child.val();
         if (v && v.word) vals.push(v);
       });
     }
+
     leaderboard = vals.sort((a, b) => b.length - a.length);
-    try { localStorage.setItem('textism-lb', JSON.stringify(leaderboard)); } catch(_) {}
-    renderLeaderboard();
+
+    // ⭐ THIS is the important fix
+    document.fonts.ready.then(() => {
+      renderLeaderboard();
+    });
+
   }, e => {
     console.warn('RTD listen failed:', e);
+
     try {
       const saved = localStorage.getItem('textism-lb');
-      if (saved) { leaderboard = JSON.parse(saved); renderLeaderboard(); }
+      if (saved) {
+        leaderboard = JSON.parse(saved);
+        renderLeaderboard();
+      }
     } catch(_) {}
   });
 }
@@ -935,27 +946,8 @@ document.getElementById('word-input').addEventListener('input', renderPreview);
 renderPreview();
 
 document.fonts.ready.then(() => {
-  function loadLeaderboard() {
-  const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
-
-  onValue(q, snapshot => {
-    const vals = [];
-
-    if (snapshot.exists()) {
-      snapshot.forEach(child => {
-        const v = child.val();
-        if (v && v.word) vals.push(v);
-      });
-    }
-
-    leaderboard = vals.sort((a, b) => b.length - a.length);
-
-    renderLeaderboard();
-
-  }, e => {
-    console.warn('RTD listen failed:', e);
-  });
-}
+  loadLeaderboard();
+});
 </script>
 </body>
 </html>
