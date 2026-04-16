@@ -564,24 +564,6 @@ buildEffGrid(basicEffects, 'basic-grid', '',   activeBasic);
 buildEffGrid(ptEffects,    'pt-grid',    'pt', activePT);
 buildEffGrid(npEffects,    'np-grid',    'np', activeNP);
 
-  btn.innerHTML = `
-    <span class="fname" style="font-family:${f.css}">${f.name}</span>
-    <span class="ftag">${f.tag}</span>
-  `;
-
-  btn.addEventListener('click', () => {
-    // clear ALL font buttons (both grids)
-    document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
-
-    activeFont = { css: f.css, name: f.name }; // important change
-    btn.classList.add('active');
-
-    renderPreview();
-  });
-
-  infiniGrid.appendChild(btn);
-});
- 
 /* ── RESET ELEMENT ── */
 function resetEl(el, size) {
   let fam = "'Rockwell','Rockwell Nova',serif";
