@@ -933,7 +933,10 @@ document.getElementById('word-input').addEventListener('input', renderPreview);
  
 /* ── INIT ── */
 renderPreview();
-loadLeaderboard();
+
+document.fonts.ready.then(() => {
+  loadLeaderboard();
+});
 </script>
 </body>
 </html>
