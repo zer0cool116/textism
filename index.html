@@ -29,6 +29,8 @@
     --f-cnew: 'Courier New', monospace;
     --f-cprime: 'Courier Prime', monospace;
     --f-press: 'Press Start 2P', monospace;
+    --accent-inf: #f0d060;
+    --accent-inf-dim: rgba(240, 208, 96, 0.12);
   }
  
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -360,8 +362,18 @@
   transform: scale(1.1);
   opacity: 1;
 }
+/* infini font buttons get a yellow left border */
+#infini-font-grid .font-btn {
+  border-left: 2px solid var(--accent-inf);
+}
+#infini-font-grid .font-btn.active {
+  background: var(--accent-inf-dim);
+  border-color: var(--accent-inf);
+}
 
- 
+  #infini-label {
+  color: var(--accent-inf);
+}
 </style>
 </head>
 <body>
@@ -393,7 +405,7 @@
   <div class="sec-label">Neighbourhood Paranoia effects</div>
   <div class="effect-grid" id="np-grid"></div>
 
-<div class="sec-label">Infini-Spired Pack</div>
+<div class="sec-label" id="infini-label">Infini-Spired Pack</div>
 <div class="font-grid" id="infini-font-grid"></div>
 
 <div class="infini-pack">
