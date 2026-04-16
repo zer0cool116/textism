@@ -581,31 +581,25 @@ if (activeFont !== null) {
  
 /* ── APPLY EFFECTS TO AN ELEMENT ── */
 function applyEffects(el, word, fontCss, basicIdxs, ptIdxs, npIdxs, baseSize) {
-  let fam = "'Rockwell','Rockwell Nova',serif";
+  const fam = fontCss || "'Rockwell','Rockwell Nova',serif";
 
-  if (activeFont !== null) {
-    fam = typeof activeFont === 'object'
-      ? activeFont.css
-      : fonts[activeFont].css;
-  }
-  
   el.style.cssText = `font-size:${baseSize||'1.3rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;`;
   el._zalgo = false; el._heir = false; el._echo = false;
   el.textContent = word;
- 
+
   let displayText = word;
- 
+
   basicIdxs.forEach(i => { if (basicEffects[i]) basicEffects[i].apply(el, displayText); });
- 
+
   ptIdxs.forEach(i => {
     const eff = ptEffects[i];
     if (!eff) return;
     if (eff.id === 'glitch-case') { displayText = glitchCase(displayText); el.textContent = displayText; }
     else eff.apply(el, displayText);
   });
- 
+
   npIdxs.forEach(i => { if (npEffects[i]) npEffects[i].apply(el, displayText); });
- 
+
   return displayText;
 }
  
