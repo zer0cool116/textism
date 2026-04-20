@@ -611,9 +611,6 @@ function applyEffects(el, word, fontCss, basicIdxs, ptIdxs, npIdxs, baseSize) {
 
   npIdxs.forEach(i => { if (npEffects[i]) npEffects[i].apply(el, displayText); });
 
-  // ── CHANGE 2: typewriter trigger in applyEffects ──
-  if (el._typewriter) buildTypewriterEffect(el, displayText);
-
   return displayText;
 }
 
@@ -676,22 +673,25 @@ function buildEchoEffect(el, text) {
   });
 }
 
-// ── CHANGE 3: buildTypewriterEffect function ──
 function buildTypewriterEffect(el, text) {
-  el.textContent = '';
-  el.style.cursor = 'default';
+  if (el._heir || el._echo) return;
+
   let i = 0;
+  const original = text;
+
   function type() {
-    if (i <= text.length) {
-      el.textContent = text.slice(0, i) + (i < text.length ? '|' : '');
+    if (i <= original.length) {
+      el.textContent = original.slice(0, i) + (i < original.length ? '|' : '');
       i++;
       setTimeout(type, 65);
     } else {
-      el.textContent = text;
+      el.textContent = original;
     }
   }
+
   el._replayTypewriter = () => { i = 0; type(); };
   el.addEventListener('mouseenter', () => el._replayTypewriter && el._replayTypewriter());
+
   type();
 }
 
