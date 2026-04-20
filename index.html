@@ -502,6 +502,7 @@ const basicEffects = [
   { name: 'slow stretch',   id: 'stretch',   apply: el => { el.style.letterSpacing = '0.6em'; } },
   { name: 'tiny',           id: 'tiny',      apply: el => { el.style.fontSize = '0.85rem'; } },
   { name: 'looming huge',   id: 'huge',      apply: el => { el.style.fontSize = '3.2rem'; } },
+  { name: 'typewriter',     id: 'typewriter',  apply: (el) => { el._typewriter = true; } },
 ];
 
 
@@ -700,7 +701,25 @@ document.addEventListener('mousemove', e => { heirMx = e.clientX; heirMy = e.cli
  
   requestAnimationFrame(animHeir);
 })();
- 
+
+function buildTypewriterEffect(el, text) {
+  el.textContent = '';
+  let i = 0;
+  function type() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i) + (i < text.length ? '|' : '');
+      i++;
+      setTimeout(type, 65);
+    } else {
+      el.textContent = text;
+    }
+  }
+  el._replayTypewriter = () => { i = 0; type(); };
+  el.style.cursor = 'default';
+  el.addEventListener('mouseenter', () => el._replayTypewriter());
+  type();
+}
+  
 /* ── RENDER PREVIEW ── */
 function renderPreview() {
   if (previewZalgoRAF) { cancelAnimationFrame(previewZalgoRAF); previewZalgoRAF = null; }
@@ -734,6 +753,7 @@ function renderPreview() {
   }
   if (pw._heir) buildHeirEffect(pw, displayText);
   if (pw._echo) buildEchoEffect(pw, displayText);
+  if (el._typewriter) buildTypewriterEffect(el, displayText);
 }
  
 /* ── SCALE TO FIT ── */
@@ -783,6 +803,7 @@ function buildLbSpan(entry, container) {
   }
   if (span._heir) buildHeirEffect(span, displayText);
   if (span._echo) buildEchoEffect(span, displayText);
+  if (span._typewriter) buildTypewriterEffect(span, displayText);
  
   if ((entry.ptIdxs||[]).some(i => ptEffects[i]?.id === 'static')) {
     span.style.textShadow = '3px 0 0 rgba(126,207,179,1), -3px 0 0 rgba(212,96,122,1), 0 0 12px rgba(126,207,179,0.7), 0 0 20px rgba(212,96,122,0.5)';
