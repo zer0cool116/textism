@@ -446,7 +446,531 @@ const app = initializeApp({
   appId:       '1:571530609364:web:1265acc2ebff4d03e6f141',
 });
 const db = getDatabase(app);
- 
+import { initializeApp }                              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, push, query,
+         orderByChild, limitToLast, onValue }         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+/* ── FONTS ── */
+const fonts = [
+  { name: 'Rockwell',           css: "'Rockwell','Rockwell Nova',serif",                     tag: 'serif' },
+  { name: 'Rockwell Condensed', css: "'Rockwell Condensed','Rockwell Nova Condensed',serif",  tag: 'serif · condensed' },
+  { name: 'Electrolize',        css: "'Electrolize',sans-serif",                              tag: 'google · tech' },
+  { name: 'Jolly Lodger',       css: "'Jolly Lodger',cursive",                                tag: 'google · display' },
+  { name: 'Amatic SC',          css: "'Amatic SC',cursive",                                   tag: 'google · handwritten' },
+  { name: 'Courier New',        css: "'Courier New',monospace",                               tag: 'mono' },
+  { name: 'Courier Prime',      css: "'Courier Prime',monospace",                             tag: 'google · mono' },
+  { name: 'Press Start 2P',     css: "'Press Start 2P',monospace",                           tag: 'google · pixel' },
+];
+
+const infiniFonts = [
+  { name: 'Pixelify Sans', css: "'Pixelify Sans', sans-serif", tag: 'pixel · clean' },
+  { name: 'Tiny5', css: "'Tiny5', monospace", tag: 'pixel · crunchy' },
+  { name: 'Doto', css: "'Doto', sans-serif", tag: 'soft · UI' },
+  { name: 'Jacquard 12', css: "'Jacquard 12', cursive", tag: 'ornate · weird' },
+  { name: 'DynaPuff', css: "'DynaPuff', cursive", tag: 'bouncy · fun' },
+  { name: 'Chewy', css: "'Chewy', cursive", tag: 'cartoon · soft' },
+  { name: 'Cherry Bomb One', css: "'Cherry Bomb One', cursive", tag: 'bold · playful' },
+];
+
+/* ── ZALGO ── */
+const zalgoUp   = ['\u030d','\u030e','\u0304','\u0305','\u033f','\u0311','\u0306','\u0310','\u0352','\u0357','\u0351','\u0307','\u0308','\u030a','\u0342','\u0343','\u0344','\u034a','\u034b','\u034c','\u0303','\u0302','\u030c','\u0350','\u0300','\u0301','\u030b','\u030f','\u0312','\u0313','\u0314','\u033d','\u0309','\u0363','\u0364','\u0365','\u0366','\u0367','\u0368','\u0369','\u036a','\u036b','\u036c','\u036d','\u036e','\u036f','\u033e','\u035b'];
+const zalgoDown = ['\u0316','\u0317','\u0318','\u0319','\u031c','\u031d','\u031e','\u031f','\u0320','\u0324','\u0325','\u0326','\u0329','\u032a','\u032b','\u032c','\u032d','\u032e','\u032f','\u0330','\u0331','\u0332','\u0333','\u0339','\u033a','\u033b','\u033c','\u0345','\u0347','\u0348','\u0349','\u034d','\u034e','\u0353','\u0354','\u0355','\u0356','\u0359','\u035a','\u0323'];
+const zalgoMid  = ['\u0315','\u031b','\u0340','\u0341','\u0358','\u0321','\u0322','\u0327','\u0328','\u0334','\u0335','\u0336','\u034f','\u035c','\u035d','\u035e','\u035f','\u0360','\u0362','\u0338','\u0337','\u0361','\u0489'];
+const randZ = arr => arr[Math.floor(Math.random() * arr.length)];
+function zalgoChar(char, intensity) {
+  let r = char;
+  for (let i = 0; i < Math.floor(Math.random() * intensity) + 1; i++) r += randZ(zalgoUp);
+  for (let i = 0; i < Math.floor(Math.random() * Math.ceil(intensity / 2)); i++) r += randZ(zalgoMid);
+  for (let i = 0; i < Math.floor(Math.random() * intensity) + 1; i++) r += randZ(zalgoDown);
+  return r;
+}
+function zalgoText(text, intensity) {
+  return text.split('').map(c => (c === ' ' || c === '"') ? c : zalgoChar(c, intensity)).join('');
+}
+
+/* ── GLITCH CASE ── */
+const glitchCase = str => str.split('').map((c, i) => i % 3 === 1 ? c.toUpperCase() : c.toLowerCase()).join('');
+
+/* ── EFFECT DEFINITIONS ── */
+const basicEffects = [
+  { name: 'bold',           id: 'bold',        apply: el => { el.style.fontWeight = '700'; } },
+  { name: 'italic',         id: 'italic',      apply: el => { el.style.fontStyle = 'italic'; } },
+  { name: 'condensed',      id: 'condensed',   apply: el => { el.style.letterSpacing = '-0.07em'; } },
+  { name: 'all caps',       id: 'allcaps',     apply: el => { el.style.textTransform = 'uppercase'; } },
+  { name: 'strikethrough',  id: 'strike',      apply: el => { el.style.textDecoration = 'line-through'; } },
+  { name: 'underline',      id: 'underline',   apply: el => { el.style.textDecoration = 'underline'; } },
+  { name: 'wired spacing',  id: 'wired',       apply: el => { el.style.letterSpacing = '0.32em'; } },
+  { name: 'slow stretch',   id: 'stretch',     apply: el => { el.style.letterSpacing = '0.6em'; } },
+  { name: 'tiny',           id: 'tiny',        apply: el => { el.style.fontSize = '0.85rem'; } },
+  { name: 'looming huge',   id: 'huge',        apply: el => { el.style.fontSize = '3.2rem'; } },
+  // ── CHANGE 1: typewriter added to basicEffects ──
+  { name: 'typewriter',     id: 'typewriter',  apply: (el) => { el._typewriter = true; } },
+];
+
+const ptEffects = [
+  { name: 'TecHJuNKiE case', id: 'glitch-case', apply: (el, text) => { el.textContent = glitchCase(text); } },
+  { name: 'static noise',    id: 'static',      apply: el => { el.style.textShadow = '2px 0 0 rgba(126,207,179,0.9), -2px 0 0 rgba(212,96,122,0.9), 0 0 8px rgba(126,207,179,0.5)'; } },
+  { name: 'echo ripple',     id: 'echo',        apply: (el, text) => { el._echo = true; } },
+  { name: 'heir ghost',      id: 'heir',        apply: (el, text) => { el._heir = true; } },
+];
+
+const npEffects = [
+  { name: 'zalgo corruption', id: 'zalgo',    apply: (el) => { el._zalgo = true; } },
+  { name: 'creeping fade',    id: 'fade',     apply: el => { el.style.opacity = '0.3'; } },
+  { name: 'rotated',          id: 'rotated',  apply: el => { el.style.transform = 'rotate(-6deg)'; } },
+];
+
+/* ── STATE ── */
+let activeFont  = null;
+let activeBasic = new Set();
+let activePT    = new Set();
+let activeNP    = new Set();
+let leaderboard = [];
+let previewZalgoRAF = null;
+
+/* ── BUILD FONT GRID ── */
+const fontGrid = document.getElementById('font-grid');
+fonts.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'font-btn';
+  btn.innerHTML = `<span class="fname" style="font-family:${f.css}">${f.name}</span><span class="ftag">${f.tag}</span>`;
+  btn.addEventListener('click', () => {
+    if (activeFont === i) { activeFont = null; btn.classList.remove('active'); }
+    else { fontGrid.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active')); activeFont = i; btn.classList.add('active'); }
+    renderPreview();
+  });
+  fontGrid.appendChild(btn);
+});
+
+const infiniGrid = document.getElementById('infini-font-grid');
+infiniFonts.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'font-btn';
+  btn.innerHTML = `<span class="fname" style="font-family:${f.css}">${f.name}</span><span class="ftag">${f.tag}</span>`;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+    activeFont = { css: f.css, name: f.name };
+    btn.classList.add('active');
+    renderPreview();
+  });
+  infiniGrid.appendChild(btn);
+});
+
+/* ── BUILD EFFECT GRIDS ── */
+function buildEffGrid(effects, containerId, cls, stateSet) {
+  const grid = document.getElementById(containerId);
+  effects.forEach((eff, i) => {
+    const btn = document.createElement('button');
+    btn.className = `eff-btn${cls ? ' ' + cls : ''}`;
+    btn.innerHTML = `${eff.name}<span class="etag">${cls === 'pt' ? 'PowerTrip' : cls === 'np' ? 'NP' : 'basic'}</span>`;
+    btn.addEventListener('click', () => {
+      if (stateSet.has(i)) { stateSet.delete(i); btn.classList.remove('active'); }
+      else { stateSet.add(i); btn.classList.add('active'); }
+      renderPreview();
+    });
+    grid.appendChild(btn);
+  });
+}
+buildEffGrid(basicEffects, 'basic-grid', '',   activeBasic);
+buildEffGrid(ptEffects,    'pt-grid',    'pt', activePT);
+buildEffGrid(npEffects,    'np-grid',    'np', activeNP);
+
+/* ── RESET ELEMENT ── */
+function resetEl(el, size) {
+  let fam = "'Rockwell','Rockwell Nova',serif";
+  if (activeFont !== null) {
+    fam = typeof activeFont === 'object'
+      ? activeFont.css
+      : fonts[activeFont].css;
+  }
+  el.style.cssText = `font-size:${size||'2.2rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;text-align:center;`;
+  el._zalgo = false;
+  el._heir  = false;
+  el._echo  = false;
+  el._typewriter = false;
+}
+
+/* ── APPLY EFFECTS TO AN ELEMENT ── */
+function applyEffects(el, word, fontCss, basicIdxs, ptIdxs, npIdxs, baseSize) {
+  const fam = fontCss || "'Rockwell','Rockwell Nova',serif";
+
+  el.style.cssText = `font-size:${baseSize||'1.3rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;`;
+  el._zalgo = false; el._heir = false; el._echo = false; el._typewriter = false;
+  el.textContent = word;
+
+  let displayText = word;
+
+  basicIdxs.forEach(i => { if (basicEffects[i]) basicEffects[i].apply(el, displayText); });
+
+  ptIdxs.forEach(i => {
+    const eff = ptEffects[i];
+    if (!eff) return;
+    if (eff.id === 'glitch-case') { displayText = glitchCase(displayText); el.textContent = displayText; }
+    else eff.apply(el, displayText);
+  });
+
+  npIdxs.forEach(i => { if (npEffects[i]) npEffects[i].apply(el, displayText); });
+
+  // ── CHANGE 2: typewriter trigger in applyEffects ──
+  if (el._typewriter) buildTypewriterEffect(el, displayText);
+
+  return displayText;
+}
+
+/* ── HEIR OF SPACE ── */
+function buildHeirEffect(el, text) {
+  el.innerHTML = '';
+  el.style.position = 'relative';
+
+  const main = document.createElement('span');
+  main.textContent = text;
+  main.style.cssText = 'color:#e8f0e0;position:relative;z-index:1;';
+
+  const rg = document.createElement('span');
+  rg.textContent = text;
+  rg.style.cssText = 'position:absolute;top:0;left:0;color:#7ecfb3;opacity:0;pointer-events:none;z-index:0;white-space:nowrap;transition:transform 0.08s ease,opacity 0.15s;';
+
+  const bg = document.createElement('span');
+  bg.textContent = text;
+  bg.style.cssText = 'position:absolute;top:0;left:0;color:#a8a89e;opacity:0;pointer-events:none;z-index:0;white-space:nowrap;transition:transform 0.08s ease,opacity 0.15s;';
+
+  el.appendChild(rg);
+  el.appendChild(bg);
+  el.appendChild(main);
+  el._rg = rg;
+  el._bg = bg;
+}
+
+/* ── ECHO RIPPLE ── */
+function buildEchoEffect(el, text) {
+  el.innerHTML = '';
+  el.style.color = 'var(--accent-np)';
+  el.style.cursor = 'default';
+
+  [...text].forEach(ch => {
+    const span = document.createElement('span');
+    span.style.cssText = 'position:relative;display:inline-block;';
+    span.textContent = ch === ' ' ? '\u00a0' : ch;
+
+    for (let i = 0; i < 3; i++) {
+      const ring = document.createElement('span');
+      ring.style.cssText = 'position:absolute;inset:0;border-radius:1px;pointer-events:none;opacity:0;border:1px solid var(--accent-np);transform:scale(1);transition:none;';
+      span.appendChild(ring);
+    }
+
+    span.addEventListener('mouseenter', () => {
+      span.querySelectorAll('span').forEach((ring, i) => {
+        ring.style.transition = 'none';
+        ring.style.opacity = '0';
+        ring.style.transform = 'scale(1)';
+        setTimeout(() => {
+          ring.style.transition = `transform ${0.5 + i * 0.18}s ease-out,opacity ${0.5 + i * 0.18}s ease-out`;
+          ring.style.transform = `scale(${2.2 + i * 1.1})`;
+          ring.style.opacity = `${0.55 - i * 0.15}`;
+        }, i * 60);
+        setTimeout(() => { ring.style.opacity = '0'; }, 300 + i * 120);
+      });
+    });
+
+    el.appendChild(span);
+  });
+}
+
+// ── CHANGE 3: buildTypewriterEffect function ──
+function buildTypewriterEffect(el, text) {
+  el.textContent = '';
+  el.style.cursor = 'default';
+  let i = 0;
+  function type() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i) + (i < text.length ? '|' : '');
+      i++;
+      setTimeout(type, 65);
+    } else {
+      el.textContent = text;
+    }
+  }
+  el._replayTypewriter = () => { i = 0; type(); };
+  el.addEventListener('mouseenter', () => el._replayTypewriter && el._replayTypewriter());
+  type();
+}
+
+/* ── HEIR PARALLAX LOOP (preview only) ── */
+let heirMx = window.innerWidth / 2, heirMy = window.innerHeight / 2;
+let heirCx = heirMx, heirCy = heirMy;
+document.addEventListener('mousemove', e => { heirMx = e.clientX; heirMy = e.clientY; });
+(function animHeir() {
+  heirCx += (heirMx - heirCx) * 0.08;
+  heirCy += (heirMy - heirCy) * 0.08;
+
+  const targets = [document.getElementById('preview-word'), ...document.querySelectorAll('.lb-rendered')];
+  targets.forEach(el => {
+    if (!el?._rg || !el?._bg) return;
+    const rect = el.getBoundingClientRect();
+    const dx = (heirCx - (rect.left + rect.width / 2)) / window.innerWidth;
+    const dy = (heirCy - (rect.top  + rect.height / 2)) / window.innerHeight;
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    const intensity = Math.min(mag * 10, 1);
+    const shift = intensity * 6;
+    el._rg.style.transform = `translate(${dx * shift * 2}px,${dy * shift}px)`;
+    el._bg.style.transform = `translate(${-dx * shift * 2}px,${-dy * shift}px)`;
+    el._rg.style.opacity = intensity * 0.85;
+    el._bg.style.opacity = intensity * 0.85;
+  });
+
+  requestAnimationFrame(animHeir);
+})();
+
+/* ── RENDER PREVIEW ── */
+function renderPreview() {
+  if (previewZalgoRAF) { cancelAnimationFrame(previewZalgoRAF); previewZalgoRAF = null; }
+
+  const word = document.getElementById('word-input').value || 'your word';
+  const pw   = document.getElementById('preview-word');
+
+  resetEl(pw, '2.2rem');
+  const displayText = applyEffects(pw, word,
+    activeFont !== null
+      ? (typeof activeFont === 'object' ? activeFont.css : fonts[activeFont].css)
+      : null,
+    [...activeBasic], [...activePT], [...activeNP], '2.2rem');
+
+  if (pw._zalgo) {
+    let frame = 0;
+    const base = displayText;
+    const zSpan = document.createElement('span');
+    zSpan.style.fontFamily = 'inherit';
+    zSpan.style.fontSize = 'inherit';
+    zSpan.style.color = 'inherit';
+    pw.innerHTML = '';
+    pw.appendChild(zSpan);
+    (function tickZ() {
+      const pulse = 2 + Math.sin(frame * 0.07) * 1.5;
+      zSpan.textContent = zalgoText(base, Math.max(1, Math.round(pulse)));
+      frame++;
+      previewZalgoRAF = requestAnimationFrame(tickZ);
+    })();
+  }
+  if (pw._heir) buildHeirEffect(pw, displayText);
+  if (pw._echo) buildEchoEffect(pw, displayText);
+  // ── CHANGE 4: typewriter in renderPreview ──
+  if (pw._typewriter) buildTypewriterEffect(pw, displayText);
+}
+
+/* ── SCALE TO FIT ── */
+function scaleToFit(el, container) {
+  const isRotated = el.style.transform && el.style.transform.includes('rotate');
+  if (isRotated) {
+    el.style.whiteSpace = 'nowrap';
+    el.style.transform = 'rotate(-6deg)';
+    el.style.display = 'inline-block';
+    const row = el.closest('.lb-row');
+    if (row) { row.style.paddingTop = '28px'; row.style.paddingBottom = '28px'; }
+    return;
+  }
+  el.style.transform = 'scaleX(1)';
+  requestAnimationFrame(() => {
+    const available = container.clientWidth;
+    const natural   = el.scrollWidth;
+    if (natural > available && available > 0) {
+      el.style.transform = `scaleX(${available / natural})`;
+    }
+  });
+}
+
+/* ── RENDER LEADERBOARD ENTRY SPAN ── */
+function buildLbSpan(entry, container) {
+  const span = document.createElement('span');
+  span.className = 'lb-rendered';
+
+  const displayText = applyEffects(span, entry.word,
+    entry.fontCss, entry.basicIdxs || [], entry.ptIdxs || [], entry.npIdxs || [], '1.3rem');
+
+  if (span._zalgo) {
+    let frame = 0;
+    const base = displayText;
+    const zSpan = document.createElement('span');
+    zSpan.style.fontFamily = 'inherit';
+    zSpan.style.fontSize = 'inherit';
+    zSpan.style.color = 'inherit';
+    span.innerHTML = '';
+    span.appendChild(zSpan);
+    (function tickZ() {
+      const pulse = 3 + Math.sin(frame * 0.07) * 2;
+      zSpan.textContent = zalgoText(base, Math.max(2, Math.round(pulse)));
+      frame++;
+      requestAnimationFrame(tickZ);
+    })();
+  }
+  if (span._heir) buildHeirEffect(span, displayText);
+  if (span._echo) buildEchoEffect(span, displayText);
+  // ── CHANGE 5: typewriter in buildLbSpan ──
+  if (span._typewriter) buildTypewriterEffect(span, displayText);
+
+  if ((entry.ptIdxs||[]).some(i => ptEffects[i]?.id === 'static')) {
+    span.style.textShadow = '3px 0 0 rgba(126,207,179,1), -3px 0 0 rgba(212,96,122,1), 0 0 12px rgba(126,207,179,0.7), 0 0 20px rgba(212,96,122,0.5)';
+  }
+
+  if (container) requestAnimationFrame(() => scaleToFit(span, container));
+
+  return span;
+}
+
+/* ── RENDER LEADERBOARD UI ── */
+function renderLeaderboard() {
+  const ll = document.getElementById('lb-list');
+  if (!leaderboard.length) { ll.innerHTML = '<div class="lb-empty">no entries yet.</div>'; return; }
+  ll.innerHTML = '';
+
+  leaderboard.forEach((entry, i) => {
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+
+    const rank = document.createElement('div');
+    rank.className = 'lb-rank';
+    rank.textContent = '#' + (i + 1);
+
+    const center = document.createElement('div');
+    center.className = 'lb-center';
+
+    center.appendChild(buildLbSpan(entry, center));
+
+    const meta = document.createElement('div');
+    meta.className = 'lb-meta';
+    const parts = [];
+    if (entry.fontName) parts.push(entry.fontName);
+    if (entry.effNames?.length) parts.push(entry.effNames.join(' · '));
+    meta.textContent = parts.join(' / ') || 'no effects';
+    center.appendChild(meta);
+
+    const chars = document.createElement('div');
+    chars.className = 'lb-chars';
+    chars.textContent = entry.word.length + ' chars';
+
+    row.appendChild(rank);
+    row.appendChild(center);
+    row.appendChild(chars);
+    ll.appendChild(row);
+  });
+}
+
+/* ── LOAD LEADERBOARD — REALTIME LISTENER ── */
+function loadLeaderboard() {
+  const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
+
+  onValue(q, snapshot => {
+    const vals = [];
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        const v = child.val();
+        if (v && v.word) vals.push(v);
+      });
+    }
+    leaderboard = vals.sort((a, b) => b.length - a.length);
+    document.fonts.ready.then(() => {
+      renderLeaderboard();
+    });
+  }, e => {
+    console.warn('RTD listen failed:', e);
+    try {
+      const saved = localStorage.getItem('textism-lb');
+      if (saved) {
+        leaderboard = JSON.parse(saved);
+        renderLeaderboard();
+      }
+    } catch(_) {}
+  });
+}
+
+/* ── ADD TO LEADERBOARD VIA REALTIME DATABASE SDK ── */
+async function addToLeaderboard() {
+  const word = document.getElementById('word-input').value.trim();
+  if (!word) { showToast('type a word first'); return; }
+
+  let fontName = null;
+  let fontCss = "'Rockwell','Rockwell Nova',serif";
+  if (activeFont !== null) {
+    if (typeof activeFont === 'object') {
+      fontName = activeFont.name;
+      fontCss = activeFont.css;
+    } else {
+      fontName = fonts[activeFont].name;
+      fontCss = fonts[activeFont].css;
+    }
+  }
+
+  const ptNames     = [...activePT].map(i  => ptEffects[i].name);
+  const npNames     = [...activeNP].map(i  => npEffects[i].name);
+  const basicNames  = [...activeBasic].map(i => basicEffects[i].name);
+  const allEffNames = [...basicNames, ...ptNames, ...npNames];
+
+  const entry = {
+    word,
+    length:    word.length,
+    fontName:  fontName || null,
+    fontCss,
+    basicIdxs: [...activeBasic],
+    ptIdxs:    [...activePT],
+    npIdxs:    [...activeNP],
+    effNames:  allEffNames,
+    addedAt:   Date.now(),
+  };
+
+  try {
+    await push(ref(db, 'textism'), entry);
+    showToast('added to leaderboard');
+  } catch(e) {
+    console.warn('RTD write failed:', e);
+    leaderboard.push(entry);
+    leaderboard.sort((a, b) => b.length - a.length);
+    leaderboard = leaderboard.slice(0, 10);
+    try { localStorage.setItem('textism-lb', JSON.stringify(leaderboard)); } catch(_) {}
+    renderLeaderboard();
+  }
+}
+
+/* ── CLEAR ALL ── */
+function clearAll() {
+  activeFont = null; activeBasic.clear(); activePT.clear(); activeNP.clear();
+  document.querySelectorAll('.font-btn, .eff-btn').forEach(b => b.classList.remove('active'));
+  renderPreview();
+}
+
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* ── TITLE FONT CYCLE ── */
+const titlePairs = [
+  ["'Rockwell','Rockwell Nova',serif",                     "'Electrolize',sans-serif"],
+  ["'Electrolize',sans-serif",                             "'Courier Prime',monospace"],
+  ["'Jolly Lodger',cursive",                               "'Rockwell','Rockwell Nova',serif"],
+  ["'Amatic SC',cursive",                                  "'Jolly Lodger',cursive"],
+  ["'Courier New',monospace",                              "'Amatic SC',cursive"],
+  ["'Rockwell Condensed','Rockwell Nova Condensed',serif", "'Courier New',monospace"],
+  ["'Courier Prime',monospace",                            "'Rockwell Condensed','Rockwell Nova Condensed',serif"],
+];
+let titleIdx = 0;
+setInterval(() => {
+  titleIdx = (titleIdx + 1) % titlePairs.length;
+  document.getElementById('tl').style.fontFamily = titlePairs[titleIdx][0];
+  document.getElementById('tr').style.fontFamily = titlePairs[titleIdx][1];
+}, 4500);
+
+/* ── WIRE UP BUTTONS ── */
+document.getElementById('btn-clear').addEventListener('click', clearAll);
+document.getElementById('btn-add').addEventListener('click', addToLeaderboard);
+document.getElementById('word-input').addEventListener('input', renderPreview);
+
+/* ── INIT ── */
+renderPreview();
+document.fonts.ready.then(() => {
+  loadLeaderboard();
+}); 
 /* ── FONTS ── */
 const fonts = [
   { name: 'Rockwell',           css: "'Rockwell','Rockwell Nova',serif",                     tag: 'serif' },
