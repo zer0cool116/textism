@@ -535,7 +535,43 @@ const npEffects = [
   { name: 'rotated',          id: 'rotated',  apply: el => { el.style.transform = 'rotate(-6deg)'; } },
   
 /* ── STATE ── */
+let activeFont  = null;
 let activeBasic = new Set();
+let activePT    = new Set();
+let activeNP    = new Set();
+let leaderboard = [];
+let previewZalgoRAF = null;
+
+/* ── BUILD FONT GRID ── */
+const fontGrid = document.getElementById('font-grid');
+fonts.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'font-btn';
+  btn.innerHTML = `<span class="fname" style="font-family:${f.css}">${f.name}</span><span class="ftag">${f.tag}</span>`;
+  btn.addEventListener('click', () => {
+    if (activeFont === i) { activeFont = null; btn.classList.remove('active'); }
+    else { fontGrid.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active')); activeFont = i; btn.classList.add('active'); }
+    renderPreview();
+  });
+  fontGrid.appendChild(btn);
+});
+  
+  const infiniGrid = document.getElementById('infini-font-grid');
+infiniFonts.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'font-btn';
+  btn.innerHTML = `<span class="fname" style="font-family:${f.css}">${f.name}</span><span class="ftag">${f.tag}</span>`;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+    activeFont = { css: f.css, name: f.name };
+    btn.classList.add('active');
+    renderPreview();
+  });
+  infiniGrid.appendChild(btn);
+});
+
+/* ── BUILD EFFECT GRIDS ── */
+function buildEffGrid(effects, containerId, cls, stateSet) {
 
 /* ── BUILD EFFECT BUTTONS ── */
 function buildEffGrid(effects, containerId) {
@@ -552,17 +588,110 @@ function buildEffGrid(effects, containerId) {
       ${eff.isNew ? '<span class="new-tag">NEW</span>' : ''}
     `;
 
-    btn.onclick = () => {
-      if (activeBasic.has(i)) {
-        activeBasic.delete(i);
-        btn.classList.remove('active');
-      } else {
-        activeBasic.add(i);
-        btn.classList.add('active');
-      }
-      renderPreview();
-    };
+          renderPreview();
+    });
+    grid.appendChild(btn);
+  });
+}
+buildEffGrid(basicEffects, 'basic-grid', '',   activeBasic);
+buildEffGrid(ptEffects,    'pt-grid',    'pt', activePT);
+buildEffGrid(npEffects,    'np-grid',    'np', activeNP);
 
+/* ── RESET ELEMENT ── */
+function resetEl(el, size) {
+  let fam = "'Rockwell','Rockwell Nova',serif";
+  if (activeFont !== null) {
+    fam = typeof activeFont === 'object'
+      ? activeFont.css
+      : fonts[activeFont].css;
+  }
+  el.style.cssText = `font-size:${size||'2.2rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;text-align:center;`;
+  el._zalgo = false;
+  el._heir  = false;
+  el._echo  = false;
+  el._typewriter = false;
+}
+    };
+/* ── APPLY EFFECTS TO AN ELEMENT ── */
+function applyEffects(el, word, fontCss, basicIdxs, ptIdxs, npIdxs, baseSize) {
+  const fam = fontCss || "'Rockwell','Rockwell Nova',serif";
+
+  el.style.cssText = `font-size:${baseSize||'1.3rem'};display:inline-block;color:var(--text);font-family:${fam};max-width:100%;word-break:break-all;`;
+  el._zalgo = false; el._heir = false; el._echo = false; el._typewriter = false;
+  el.textContent = word;
+
+  let displayText = word;
+
+  basicIdxs.forEach(i => { if (basicEffects[i]) basicEffects[i].apply(el, displayText); });
+
+  ptIdxs.forEach(i => {
+    const eff = ptEffects[i];
+    if (!eff) return;
+    if (eff.id === 'glitch-case') { displayText = glitchCase(displayText); el.textContent = displayText; }
+    else eff.apply(el, displayText);
+  });
+
+  npIdxs.forEach(i => { if (npEffects[i]) npEffects[i].apply(el, displayText); });
+
+  return displayText;
+}
+
+/* ── HEIR OF SPACE ── */
+function buildHeirEffect(el, text) {
+  el.innerHTML = '';
+  el.style.position = 'relative';
+
+  const main = document.createElement('span');
+  main.textContent = text;
+  main.style.cssText = 'color:#e8f0e0;position:relative;z-index:1;';
+
+  const rg = document.createElement('span');
+  rg.textContent = text;
+  rg.style.cssText = 'position:absolute;top:0;left:0;color:#7ecfb3;opacity:0;pointer-events:none;z-index:0;white-space:nowrap;transition:transform 0.08s ease,opacity 0.15s;';
+
+  const bg = document.createElement('span');
+  bg.textContent = text;
+  bg.style.cssText = 'position:absolute;top:0;left:0;color:#a8a89e;opacity:0;pointer-events:none;z-index:0;white-space:nowrap;transition:transform 0.08s ease,opacity 0.15s;';
+
+  el.appendChild(rg);
+  el.appendChild(bg);
+  el.appendChild(main);
+  el._rg = rg;
+  el._bg = bg;
+}
+
+/* ── ECHO RIPPLE ── */
+function buildEchoEffect(el, text) {
+  el.innerHTML = '';
+  el.style.color = 'var(--accent-np)';
+  el.style.cursor = 'default';
+
+  [...text].forEach(ch => {
+    const span = document.createElement('span');
+    span.style.cssText = 'position:relative;display:inline-block;';
+    span.textContent = ch === ' ' ? '\u00a0' : ch;
+
+    for (let i = 0; i < 3; i++) {
+      const ring = document.createElement('span');
+      ring.style.cssText = 'position:absolute;inset:0;border-radius:1px;pointer-events:none;opacity:0;border:1px solid var(--accent-np);transform:scale(1);transition:none;';
+      span.appendChild(ring);
+    }
+
+    span.addEventListener('mouseenter', () => {
+      span.querySelectorAll('span').forEach((ring, i) => {
+        ring.style.transition = 'none';
+        ring.style.opacity = '0';
+        ring.style.transform = 'scale(1)';
+        setTimeout(() => {
+          ring.style.transition = `transform ${0.5 + i * 0.18}s ease-out,opacity ${0.5 + i * 0.18}s ease-out`;
+          ring.style.transform = `scale(${2.2 + i * 1.1})`;
+          ring.style.opacity = `${0.55 - i * 0.15}`;
+        }, i * 60);
+        setTimeout(() => { ring.style.opacity = '0'; }, 300 + i * 120);
+      });
+    });
+
+    el.appendChild(span);
     grid.appendChild(btn);
   });
 }
@@ -611,6 +740,307 @@ function applyEffects(el, text) {
   // FINAL PASS ONLY
   if (el._typewriter) buildTypewriterEffect(el, text);
 }
+
+
+/* ── HEIR PARALLAX LOOP (preview only) ── */
+let heirMx = window.innerWidth / 2, heirMy = window.innerHeight / 2;
+let heirCx = heirMx, heirCy = heirMy;
+document.addEventListener('mousemove', e => { heirMx = e.clientX; heirMy = e.clientY; });
+(function animHeir() {
+  heirCx += (heirMx - heirCx) * 0.08;
+  heirCy += (heirMy - heirCy) * 0.08;
+ 
+  const targets = [document.getElementById('preview-word'), ...document.querySelectorAll('.lb-rendered')];
+  targets.forEach(el => {
+    if (!el?._rg || !el?._bg) return;
+    const rect = el.getBoundingClientRect();
+    const dx = (heirCx - (rect.left + rect.width / 2)) / window.innerWidth;
+    const dy = (heirCy - (rect.top  + rect.height / 2)) / window.innerHeight;
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    const intensity = Math.min(mag * 10, 1);
+    const shift = intensity * 6;
+    el._rg.style.transform = `translate(${dx * shift * 2}px,${dy * shift}px)`;
+    el._bg.style.transform = `translate(${-dx * shift * 2}px,${-dy * shift}px)`;
+    el._rg.style.opacity = intensity * 0.85;
+    el._bg.style.opacity = intensity * 0.85;
+  });
+ 
+  requestAnimationFrame(animHeir);
+})();
+
+function buildTypewriterEffect(el, text) {
+  el.textContent = '';
+  let i = 0;
+  function type() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i) + (i < text.length ? '|' : '');
+      i++;
+      setTimeout(type, 65);
+    } else {
+      el.textContent = text;
+    }
+  }
+  el._replayTypewriter = () => { i = 0; type(); };
+  el.style.cursor = 'default';
+  el.addEventListener('mouseenter', () => el._replayTypewriter());
+  type();
+}
+  
+/* ── PREVIEW ── */
+function renderPreview() {
+  if (previewZalgoRAF) { cancelAnimationFrame(previewZalgoRAF); previewZalgoRAF = null; }
+ 
+  const word = document.getElementById('word-input').value || 'your word';
+  const pw   = document.getElementById('preview-word');
+ 
+  resetEl(pw, '2.2rem');
+  const displayText = applyEffects(pw, word,
+    activeFont !== null
+  ? (typeof activeFont === 'object' ? activeFont.css : fonts[activeFont].css)
+  : null,
+    [...activeBasic], [...activePT], [...activeNP], '2.2rem');
+ 
+  if (pw._zalgo) {
+    let frame = 0;
+    const base = displayText;
+    const savedStyle = pw.style.cssText;
+    const zSpan = document.createElement('span');
+    zSpan.style.fontFamily = 'inherit';
+    zSpan.style.fontSize = 'inherit';
+    zSpan.style.color = 'inherit';
+    pw.innerHTML = '';
+    pw.appendChild(zSpan);
+    (function tickZ() {
+      const pulse = 2 + Math.sin(frame * 0.07) * 1.5;
+      zSpan.textContent = zalgoText(base, Math.max(1, Math.round(pulse)));
+      frame++;
+      previewZalgoRAF = requestAnimationFrame(tickZ);
+    })();
+  }
+  if (pw._heir) buildHeirEffect(pw, displayText);
+  if (pw._echo) buildEchoEffect(pw, displayText);
+  if (el._typewriter) buildTypewriterEffect(el, displayText);
+}
+ 
+/* ── SCALE TO FIT ── */
+function scaleToFit(el, container) {
+  const isRotated = el.style.transform && el.style.transform.includes('rotate');
+  if (isRotated) {
+    el.style.whiteSpace = 'nowrap';
+    el.style.transform = 'rotate(-6deg)';
+    el.style.display = 'inline-block';
+    const row = el.closest('.lb-row');
+    if (row) { row.style.paddingTop = '28px'; row.style.paddingBottom = '28px'; }
+    return;
+  }
+  el.style.transform = 'scaleX(1)';
+  requestAnimationFrame(() => {
+    const available = container.clientWidth;
+    const natural   = el.scrollWidth;
+    if (natural > available && available > 0) {
+      el.style.transform = `scaleX(${available / natural})`;
+    }
+  });
+}
+ 
+/* ── RENDER LEADERBOARD ENTRY SPAN ── */
+function buildLbSpan(entry, container) {
+  const span = document.createElement('span');
+  span.className = 'lb-rendered';
+ 
+  const displayText = applyEffects(span, entry.word,
+    entry.fontCss, entry.basicIdxs || [], entry.ptIdxs || [], entry.npIdxs || [], '1.3rem');
+ 
+  if (span._zalgo) {
+    let frame = 0;
+    const base = displayText;
+    const zSpan = document.createElement('span');
+    zSpan.style.fontFamily = 'inherit';
+    zSpan.style.fontSize = 'inherit';
+    zSpan.style.color = 'inherit';
+    span.innerHTML = '';
+    span.appendChild(zSpan);
+    (function tickZ() {
+      const pulse = 3 + Math.sin(frame * 0.07) * 2;
+      zSpan.textContent = zalgoText(base, Math.max(2, Math.round(pulse)));
+      frame++;
+      requestAnimationFrame(tickZ);
+    })();
+  }
+  if (span._heir) buildHeirEffect(span, displayText);
+  if (span._echo) buildEchoEffect(span, displayText);
+  if (pw._typewriter) buildTypewriterEffect(pw, displayText);
+ 
+  if ((entry.ptIdxs||[]).some(i => ptEffects[i]?.id === 'static')) {
+    span.style.textShadow = '3px 0 0 rgba(126,207,179,1), -3px 0 0 rgba(212,96,122,1), 0 0 12px rgba(126,207,179,0.7), 0 0 20px rgba(212,96,122,0.5)';
+  }
+ 
+  if (container) requestAnimationFrame(() => scaleToFit(span, container));
+ 
+  return span;
+}
+ 
+/* ── RENDER LEADERBOARD UI ── */
+function renderLeaderboard() {
+  const ll = document.getElementById('lb-list');
+  if (!leaderboard.length) { ll.innerHTML = '<div class="lb-empty">no entries yet.</div>'; return; }
+  ll.innerHTML = '';
+ 
+  leaderboard.forEach((entry, i) => {
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+ 
+    const rank = document.createElement('div');
+    rank.className = 'lb-rank';
+    rank.textContent = '#' + (i + 1);
+ 
+    const center = document.createElement('div');
+    center.className = 'lb-center';
+ 
+    center.appendChild(buildLbSpan(entry, center));
+ 
+    const meta = document.createElement('div');
+    meta.className = 'lb-meta';
+    const parts = [];
+    if (entry.fontName) parts.push(entry.fontName);
+    if (entry.effNames?.length) parts.push(entry.effNames.join(' · '));
+    meta.textContent = parts.join(' / ') || 'no effects';
+    center.appendChild(meta);
+ 
+    const chars = document.createElement('div');
+    chars.className = 'lb-chars';
+    chars.textContent = entry.word.length + ' chars';
+ 
+    row.appendChild(rank);
+    row.appendChild(center);
+    row.appendChild(chars);
+    ll.appendChild(row);
+  });
+}
+ 
+/* ── LOAD LEADERBOARD — REALTIME LISTENER ── */
+function loadLeaderboard() {
+  const q = query(ref(db, 'textism'), orderByChild('length'), limitToLast(10));
+
+  onValue(q, snapshot => {
+    const vals = [];
+
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        const v = child.val();
+        if (v && v.word) vals.push(v);
+      });
+    }
+
+    leaderboard = vals.sort((a, b) => b.length - a.length);
+  const el = document.getElementById('preview-word');
+
+    // ⭐ THIS is the important fix
+    document.fonts.ready.then(() => {
+      renderLeaderboard();
+    });
+
+  }, e => {
+    console.warn('RTD listen failed:', e);
+
+    try {
+      const saved = localStorage.getItem('textism-lb');
+      if (saved) {
+        leaderboard = JSON.parse(saved);
+        renderLeaderboard();
+      }
+    } catch(_) {}
+  });
+  el.style.fontSize = '2rem';
+  applyEffects(el, word);
+}
+ 
+/* ── ADD TO LEADERBOARD VIA REALTIME DATABASE SDK ── */
+async function addToLeaderboard() {
+  const word = document.getElementById('word-input').value.trim();
+  if (!word) { showToast('type a word first'); return; }
+ let fontName = null;
+let fontCss = "'Rockwell','Rockwell Nova',serif";
+
+if (activeFont !== null) {
+  if (typeof activeFont === 'object') {
+    fontName = activeFont.name;
+    fontCss = activeFont.css;
+  } else {
+    fontName = fonts[activeFont].name;
+    fontCss = fonts[activeFont].css;
+  }
+}
+  const ptNames     = [...activePT].map(i  => ptEffects[i].name);
+  const npNames     = [...activeNP].map(i  => npEffects[i].name);
+  const basicNames  = [...activeBasic].map(i => basicEffects[i].name);
+  const allEffNames = [...basicNames, ...ptNames, ...npNames];
+ 
+  const entry = {
+    word,
+    length:    word.length,
+    fontName:  fontName || null,
+    fontCss,
+    basicIdxs: [...activeBasic],
+    ptIdxs:    [...activePT],
+    npIdxs:    [...activeNP],
+    effNames:  allEffNames,
+    addedAt:   Date.now(),
+  };
+ 
+  try {
+    await push(ref(db, 'textism'), entry);
+    showToast('added to leaderboard');
+  } catch(e) {
+    console.warn('RTD write failed:', e);
+    // fallback: add locally if Firebase failed
+    leaderboard.push(entry);
+    leaderboard.sort((a, b) => b.length - a.length);
+    leaderboard = leaderboard.slice(0, 10);
+    try { localStorage.setItem('textism-lb', JSON.stringify(leaderboard)); } catch(_) {}
+    renderLeaderboard();
+  }
+}
+ 
+/* ── CLEAR ALL ── */
+function clearAll() {
+  activeFont = null; activeBasic.clear(); activePT.clear(); activeNP.clear();
+  document.querySelectorAll('.font-btn, .eff-btn').forEach(b => b.classList.remove('active'));
+  renderPreview();
+}
+ 
+/* ── TOAST ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+ 
+/* ── TITLE FONT CYCLE ── */
+const titlePairs = [
+  ["'Rockwell','Rockwell Nova',serif",                     "'Electrolize',sans-serif"],
+  ["'Electrolize',sans-serif",                             "'Courier Prime',monospace"],
+  ["'Jolly Lodger',cursive",                               "'Rockwell','Rockwell Nova',serif"],
+  ["'Amatic SC',cursive",                                  "'Jolly Lodger',cursive"],
+  ["'Courier New',monospace",                              "'Amatic SC',cursive"],
+  ["'Rockwell Condensed','Rockwell Nova Condensed',serif", "'Courier New',monospace"],
+  ["'Courier Prime',monospace",                            "'Rockwell Condensed','Rockwell Nova Condensed',serif"],
+];
+let titleIdx = 0;
+setInterval(() => {
+  titleIdx = (titleIdx + 1) % titlePairs.length;
+  document.getElementById('tl').style.fontFamily = titlePairs[titleIdx][0];
+  document.getElementById('tr').style.fontFamily = titlePairs[titleIdx][1];
+}, 4500);
+ 
+/* ── WIRE UP BUTTONS (module scope safe) ── */
+document.getElementById('btn-clear').addEventListener('click', clearAll);
+document.getElementById('btn-add').addEventListener('click', addToLeaderboard);
+document.getElementById('word-input').addEventListener('input', renderPreview);
+ 
+/* ── INIT ── */
+renderPreview();
 
 /* ── PREVIEW ── */
 function renderPreview() {
