@@ -7,7 +7,11 @@
 <title>Text-ism</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Jolly+Lodger&family=Amatic+SC:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&family=Pixelify+Sans:wght@400;700&family=Tiny5&family=Doto&family=Jacquard+12&family=DynaPuff:wght@400;600&family=Chewy&family=Cherry+Bomb+One&display=swap" rel="stylesheet"> 
+<link href="https://fonts.googleapis.com/css2?family=Electrolize&family=Jolly+Lodger&family=Amatic+SC:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Press+Start+2P&family=Pixelify+Sans:wght@400;700&family=Tiny5&family=Doto&family=Jacquard+12&family=DynaPuff:wght@400;600&family=Chewy&family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+
+<!-- ✅ Entry point — all JS lives here, no inline scripts -->
+<script type="module" src="app.js"></script>
+
 <style>
   :root {
     --bg: #0e0e0e;
@@ -22,6 +26,8 @@
     --accent-np: #d4607a;
     --accent-pt-dim: rgba(126,207,179,0.12);
     --accent-np-dim: rgba(212,96,122,0.12);
+    --accent-inf: #f0d060;
+    --accent-inf-dim: rgba(240, 208, 96, 0.12);
     --f-rock: 'Rockwell', 'Rockwell Nova', serif;
     --f-rockc: 'Rockwell Condensed', 'Rockwell Nova Condensed', serif;
     --f-elec: 'Electrolize', sans-serif;
@@ -30,12 +36,10 @@
     --f-cnew: 'Courier New', monospace;
     --f-cprime: 'Courier Prime', monospace;
     --f-press: 'Press Start 2P', monospace;
-    --accent-inf: #f0d060;
-    --accent-inf-dim: rgba(240, 208, 96, 0.12);
   }
- 
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -43,21 +47,21 @@
     min-height: 100vh;
     padding: 0 0 4rem;
   }
- 
+
   header {
     padding: 3rem 1.5rem 2rem;
     text-align: center;
     border-bottom: 0.5px solid var(--border);
     margin-bottom: 2rem;
   }
- 
+
   .site-title {
     display: inline-flex;
     align-items: baseline;
     gap: 0;
     line-height: 1;
   }
- 
+
   .title-left {
     font-size: clamp(2.8rem, 8vw, 5rem);
     font-weight: 700;
@@ -65,14 +69,14 @@
     transition: font-family 1.4s ease;
     font-family: var(--f-rock);
   }
- 
+
   .title-dash {
     font-size: clamp(2.8rem, 8vw, 5rem);
     color: var(--text3);
     font-family: var(--f-rock);
     font-weight: 400;
   }
- 
+
   .title-right {
     font-size: clamp(2.8rem, 8vw, 5rem);
     font-weight: 400;
@@ -80,7 +84,7 @@
     transition: font-family 1.4s ease;
     font-family: var(--f-elec);
   }
- 
+
   .subtitle {
     font-family: var(--f-cprime);
     font-size: 0.8rem;
@@ -89,19 +93,19 @@
     margin-top: 0.6rem;
     text-transform: lowercase;
   }
- 
+
   .container {
     max-width: 760px;
     margin: 0 auto;
     padding: 0 1.25rem;
   }
- 
+
   .input-wrap {
     display: flex;
     gap: 8px;
     margin-bottom: 2rem;
   }
- 
+
   #word-input {
     flex: 1;
     background: var(--bg2);
@@ -116,7 +120,7 @@
   }
   #word-input:focus { border-color: rgba(255,255,255,0.35); }
   #word-input::placeholder { color: var(--text3); }
- 
+
   .btn-clear {
     background: transparent;
     border: 0.5px solid var(--border-hover);
@@ -130,7 +134,7 @@
     transition: background 0.15s, color 0.15s;
   }
   .btn-clear:hover { background: var(--bg3); color: var(--text); }
- 
+
   .sec-label {
     font-family: var(--f-elec);
     font-size: 0.65rem;
@@ -148,14 +152,14 @@
     height: 0.5px;
     background: var(--border);
   }
- 
+
   .font-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 6px;
     margin-bottom: 2rem;
   }
- 
+
   .font-btn {
     background: var(--bg2);
     border: 0.5px solid var(--border);
@@ -170,16 +174,17 @@
   .font-btn:hover { border-color: var(--border-hover); background: var(--bg3); }
   .font-btn.active { border-color: rgba(255,255,255,0.4); background: var(--bg3); }
   .font-btn .fname { font-size: 1rem; display: block; }
-  .font-btn .ftag { font-size: 0.65rem; color: var(--text3); font-family: var(--f-elec); letter-spacing: 0.06em; display: block; margin-top: 3px; }
- 
+  .font-btn .ftag  { font-size: 0.65rem; color: var(--text3); font-family: var(--f-elec); letter-spacing: 0.06em; display: block; margin-top: 3px; }
+
   .effect-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
     gap: 6px;
     margin-bottom: 2rem;
   }
- 
+
   .eff-btn {
+    position: relative;
     background: var(--bg2);
     border: 0.5px solid var(--border);
     color: var(--text);
@@ -199,15 +204,19 @@
     text-transform: uppercase;
     margin-top: 3px;
   }
-  .eff-btn:hover { border-color: var(--border-hover); background: var(--bg3); }
+  .eff-btn:hover  { border-color: var(--border-hover); background: var(--bg3); }
   .eff-btn.active { background: var(--bg3); border-color: rgba(255,255,255,0.4); }
-  .eff-btn.pt { border-left: 2px solid var(--accent-pt); }
-  .eff-btn.pt .etag { color: var(--accent-pt); }
-  .eff-btn.pt.active { background: var(--accent-pt-dim); border-color: var(--accent-pt); }
-  .eff-btn.np { border-left: 2px solid var(--accent-np); }
-  .eff-btn.np .etag { color: var(--accent-np); }
-  .eff-btn.np.active { background: var(--accent-np-dim); border-color: var(--accent-np); }
- 
+
+  /* ── PT colour theme ── */
+  .eff-btn.pt               { border-left: 2px solid var(--accent-pt); }
+  .eff-btn.pt .etag         { color: var(--accent-pt); }
+  .eff-btn.pt.active        { background: var(--accent-pt-dim); border-color: var(--accent-pt); }
+
+  /* ── NP colour theme ── */
+  .eff-btn.np               { border-left: 2px solid var(--accent-np); }
+  .eff-btn.np .etag         { color: var(--accent-np); }
+  .eff-btn.np.active        { background: var(--accent-np-dim); border-color: var(--accent-np); }
+
   .preview-wrap {
     min-height: 120px;
     border: 0.5px solid var(--border);
@@ -220,7 +229,7 @@
     margin-bottom: 1rem;
     overflow: hidden;
   }
- 
+
   #preview-word {
     font-size: 2.2rem;
     display: inline-block;
@@ -230,7 +239,7 @@
     word-break: break-all;
     text-align: center;
   }
- 
+
   .btn-add {
     width: 100%;
     padding: 11px;
@@ -246,24 +255,24 @@
     margin-bottom: 2.5rem;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
-  .btn-add:hover { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.3); }
+  .btn-add:hover  { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.3); }
   .btn-add:active { opacity: 0.7; }
- 
+
   .divider {
     border: none;
     border-top: 0.5px solid var(--border);
     margin: 0 0 2rem;
   }
- 
+
   .lb-list { display: flex; flex-direction: column; gap: 8px; }
- 
+
   .lb-empty {
     font-family: var(--f-cprime);
     font-size: 0.85rem;
     color: var(--text3);
     font-style: italic;
   }
- 
+
   .lb-row {
     display: flex;
     align-items: center;
@@ -275,7 +284,7 @@
     min-height: 64px;
     overflow: visible;
   }
- 
+
   .lb-rank {
     font-family: var(--f-elec);
     font-size: 0.7rem;
@@ -283,14 +292,14 @@
     min-width: 24px;
     flex-shrink: 0;
   }
- 
+
   .lb-center {
     flex: 1;
     overflow: hidden;
     min-width: 0;
     padding: 8px 0;
   }
- 
+
   .lb-rendered {
     display: block;
     font-size: 1.3rem;
@@ -301,7 +310,7 @@
     line-height: 1.6;
     transform-origin: left center;
   }
- 
+
   .lb-meta {
     font-family: var(--f-elec);
     font-size: 0.6rem;
@@ -312,14 +321,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
- 
+
   .lb-chars {
     font-family: var(--f-elec);
     font-size: 0.7rem;
     color: var(--text3);
     white-space: nowrap;
   }
- 
+
   .toast {
     position: fixed;
     bottom: 2rem;
@@ -340,64 +349,49 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
- .infini-pack {
-  margin-top: -1rem;
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--f-cprime);
-  font-size: 0.65rem;
-  color: var(--text3);
-}
+  .infini-pack {
+    margin-top: -1rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--f-cprime);
+    font-size: 0.65rem;
+    color: var(--text3);
+  }
 
-.infini-pack img {
-  height: 31px;
-  image-rendering: pixelated;
-  opacity: 0.85;
-  transition: transform 0.15s ease, opacity 0.15s ease;
-}
+  .infini-pack img {
+    height: 31px;
+    image-rendering: pixelated;
+    opacity: 0.85;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .infini-pack img:hover { transform: scale(1.1); opacity: 1; }
 
-.infini-pack img:hover {
-  transform: scale(1.1);
-  opacity: 1;
-}
-/* infini font buttons get a yellow left border */
-#infini-font-grid .font-btn {
-  border-left: 2px solid var(--accent-inf);
-}
-#infini-font-grid .font-btn.active {
-  background: var(--accent-inf-dim);
-  border-color: var(--accent-inf);
-}
+  /* Infini font buttons — yellow left border */
+  #infini-font-grid .font-btn               { border-left: 2px solid var(--accent-inf); }
+  #infini-font-grid .font-btn.active        { background: var(--accent-inf-dim); border-color: var(--accent-inf); }
 
-#infini-label {
-  color: var(--accent-inf);
-}
+  #infini-label { color: var(--accent-inf); }
 
-.new-tag {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #ff4d6d;
-  color: white;
-  font-size: 0.55rem;
-  padding: 2px 5px;
-  border-radius: 6px;
-  font-weight: bold;
-  letter-spacing: 0.05em;
-  pointer-events: none;
-}
-
-.eff-btn {
-  position: relative;
-}
-  
+  .new-tag {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ff4d6d;
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px 5px;
+    border-radius: 6px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
- 
+
 <header>
   <div class="site-title">
     <span class="title-left" id="tl">Text</span>
@@ -406,288 +400,52 @@
   </div>
   <p class="subtitle">a writing effects playground</p>
 </header>
- 
+
 <div class="container">
   <div class="input-wrap">
     <input type="text" id="word-input" placeholder="type a word…" maxlength="80" autocomplete="off" spellcheck="false" />
     <button class="btn-clear" id="btn-clear">clear all</button>
   </div>
- 
+
   <div class="sec-label">font</div>
   <div class="font-grid" id="font-grid"></div>
- 
+
   <div class="sec-label">basic effects</div>
   <div class="effect-grid" id="basic-grid"></div>
- 
+
   <div class="sec-label">PowerTrip: TecHJuNKiE effects</div>
   <div class="effect-grid" id="pt-grid"></div>
- 
+
   <div class="sec-label">Neighbourhood Paranoia effects</div>
   <div class="effect-grid" id="np-grid"></div>
 
-<div class="sec-label" id="infini-label">Infini-Spired Pack</div>
-<div class="font-grid" id="infini-font-grid"></div>
+  <div class="sec-label" id="infini-label">Infini-Spired Pack</div>
+  <div class="font-grid" id="infini-font-grid"></div>
 
-<div class="infini-pack">
-  <span>inspired by</span>
-  <a href="https://infini.gay" target="_blank">
-    <img src="https://infini.gay/images/infinibutton.gif" alt="infini site button">
-  </a>
-</div>
- 
+  <div class="infini-pack">
+    <span>inspired by</span>
+    <a href="https://infini.gay" target="_blank">
+      <img src="https://infini.gay/images/infinibutton.gif" alt="infini site button">
+    </a>
+  </div>
+
   <div class="preview-wrap">
     <span id="preview-word">your word</span>
   </div>
- 
+
   <button class="btn-add" id="btn-add">+ add to leaderboard</button>
- 
+
   <hr class="divider">
- 
+
   <div class="sec-label">leaderboard — longest words</div>
   <div class="lb-list" id="lb-list">
     <div class="lb-empty">loading…</div>
   </div>
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, push, query, orderByChild, limitToLast, onValue } 
-from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-/* ── FIREBASE ── */
-const app = initializeApp({
-  apiKey: 'AIzaSy...',
-  authDomain: 'zerpleneo.firebaseapp.com',
-  databaseURL: 'https://zerpleneo-default-rtdb.firebaseio.com',
-  projectId: 'zerpleneo',
-  appId: '1:571530609364:web:1265acc2ebff4d03e6f141',
-});
-const db = getDatabase(app);
+<!-- ✅ No inline script block — everything loads via app.js above -->
 
-/* ── STATE ── */
-let activeFont = null;
-let activeBasic = new Set();
-
-/* ── FONTS ── */
-const fonts = [
-  { name: 'Rockwell', css: "'Rockwell',serif" },
-  { name: 'Electrolize', css: "'Electrolize',sans-serif" },
-  { name: 'Jolly Lodger', css: "'Jolly Lodger',cursive" },
-  { name: 'Amatic SC', css: "'Amatic SC',cursive" },
-  { name: 'Courier Prime', css: "'Courier Prime',monospace" },
-  { name: 'Press Start 2P', css: "'Press Start 2P',monospace" }
-];
-
-/* ── EFFECTS ── */
-const effects = [
-  { name: 'bold', apply: el => el.style.fontWeight = '700' },
-  { name: 'italic', apply: el => el.style.fontStyle = 'italic' },
-  { name: 'underline', apply: el => el.style.textDecoration = 'underline' },
-  { name: 'all caps', apply: el => el.style.textTransform = 'uppercase' },
-
- /* ─────────────────────────────────────────────
-   ADVANCED EFFECT SYSTEM
-──────────────────────────────────────────── */
-
-/* ZALGO */
-const zalgoUp = ['\u030d','\u030e','\u0304','\u0305','\u033f','\u0311','\u0306','\u0310','\u0352','\u0357'];
-const zalgoMid = ['\u0334','\u0335','\u0336','\u034f','\u035c'];
-const zalgoDown = ['\u0316','\u0317','\u0318','\u0319','\u0320'];
-
-const r = arr => arr[Math.floor(Math.random()*arr.length)];
-
-function zalgoChar(c, i=2){
-  let out = c;
-  for (let j=0;j<i;j++) out += r(zalgoUp);
-  for (let j=0;j<i;j++) out += r(zalgoMid);
-  for (let j=0;j<i;j++) out += r(zalgoDown);
-  return out;
-}
-
-function zalgoText(t){
-  return t.split('').map(c => c === ' ' ? c : zalgoChar(c)).join('');
-}
-
-/* GLITCH CASE */
-const glitchCase = s =>
-  s.split('').map((c,i)=> i%3===0 ? c.toUpperCase() : c.toLowerCase()).join('');
-
-/* ─────────────────────────────────────────────
-   EFFECT DEFINITIONS
-──────────────────────────────────────────── */
-
-const basicEffects = [
-  { name:'bold', apply:el=>el.style.fontWeight='700' },
-  { name:'italic', apply:el=>el.style.fontStyle='italic' },
-  { name:'caps', apply:el=>el.style.textTransform='uppercase' },
-  { name:'spacing', apply:el=>el.style.letterSpacing='0.25em' }
-];
-
-const ptEffects = [
-  {
-    name:'TecHJuNKiE case',
-    apply:(el)=>{ el._glitch=true; }
-  },
-  {
-    name:'static noise',
-    apply:(el)=> {
-      el.style.textShadow =
-        '2px 0 #7ecfb3,-2px 0 #d4607a,0 0 10px rgba(255,255,255,0.2)';
-    }
-  },
-  {
-    name:'echo ripple',
-    apply:(el)=>{ el._echo=true; }
-  }
-];
-
-const npEffects = [
-  { name:'zalgo corruption', apply:el=>el._zalgo=true },
-  { name:'fade', apply:el=>el.style.opacity='0.4' },
-  { name:'rotate', apply:el=>el.style.transform='rotate(-4deg)' }
-];
-
-/* ─────────────────────────────────────────────
-   APPLY ENGINE (CORE FIX)
-──────────────────────────────────────────── */
-function applyAll(el, text) {
-  let out = text;
-
-  // FONT
-  if (activeFont !== null)
-    el.style.fontFamily = fonts[activeFont].css;
-
-  el.textContent = text;
-
-  // BASIC
-  activeBasic.forEach(i => basicEffects[i]?.apply(el));
-
-  // PT
-  activePT.forEach(i => {
-    const e = ptEffects[i];
-    if (!e) return;
-    if (e.name === 'TecHJuNKiE case') out = glitchCase(out);
-    e.apply(el, out);
-  });
-
-  // NP
-  activeNP.forEach(i => npEffects[i]?.apply(el));
-
-  return out;
-}
-
-/* ─────────────────────────────────────────────
-   TYPEWRITER
-──────────────────────────────────────────── */
-function typewriter(el, text){
-  el.textContent='';
-  let i=0;
-  const tick=()=>{
-    if(i<=text.length){
-      el.textContent=text.slice(0,i)+(i<text.length?'|':'');
-      i++;
-      setTimeout(tick,55);
-    }else el.textContent=text;
-  };
-  tick();
-}
-
-/* ─────────────────────────────────────────────
-   PREVIEW
-──────────────────────────────────────────── */
-function renderPreview(){
-  const el=document.getElementById('preview-word');
-  const text=document.getElementById('word-input').value||'your word';
-
-  el._zalgo=false;
-  el._echo=false;
-
-  const out=applyAll(el,text);
-
-  if(el._zalgo){
-    let base=out;
-    let frame=0;
-    const tick=()=>{
-      el.textContent=zalgoText(base);
-      frame++;
-      requestAnimationFrame(tick);
-    };
-    tick();
-  }
-
-  if(el._echo){
-    el.innerHTML='';
-    [...out].forEach(c=>{
-      const s=document.createElement('span');
-      s.textContent=c;
-      s.onmouseenter=()=>{
-        s.animate([
-          {transform:'scale(1)'},
-          {transform:'scale(1.6)'}
-        ],200);
-      };
-      el.appendChild(s);
-    });
-  }
-}
-
-/* ─────────────────────────────────────────────
-   UI BUILDERS
-──────────────────────────────────────────── */
-function buildButtons(list, containerId, set){
-  const c=document.getElementById(containerId);
-  list.forEach((eff,i)=>{
-    const b=document.createElement('button');
-    b.className='eff-btn';
-    b.textContent=eff.name;
-
-    b.onclick=()=>{
-      if(set.has(i)){
-        set.delete(i);
-        b.classList.remove('active');
-      }else{
-        set.add(i);
-        b.classList.add('active');
-      }
-      renderPreview();
-    };
-
-    c.appendChild(b);
-  });
-}
-
-function buildFonts(){
-  const c=document.getElementById('font-grid');
-  fonts.forEach((f,i)=>{
-    const b=document.createElement('button');
-    b.className='font-btn';
-    b.innerHTML=f.name;
-
-    b.onclick=()=>{
-      activeFont=i;
-      renderPreview();
-    };
-
-    c.appendChild(b);
-  });
-}
-
-/* ─────────────────────────────────────────────
-   INIT
-──────────────────────────────────────────── */
-buildFonts();
-buildButtons(basicEffects,'basic-grid',activeBasic);
-buildButtons(ptEffects,'pt-grid',activePT);
-buildButtons(npEffects,'np-grid',activeNP);
-
-document.getElementById('word-input')
-  .addEventListener('input',renderPreview);
-
-renderPreview();
-  
-</script>
 </body>
 </html>
- 
